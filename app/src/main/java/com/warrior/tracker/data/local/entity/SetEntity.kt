@@ -5,6 +5,7 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import com.warrior.tracker.core.common.SetType
 
 /**
  * `sets` — sec.10.6. The core table for Strength tracking.
@@ -30,7 +31,7 @@ data class SetEntity(
     @PrimaryKey val id: String,
     @ColumnInfo(name = "activity_id") val activityId: String,
     @ColumnInfo(name = "set_number") val setNumber: Int,
-    @ColumnInfo(name = "set_type") val setType: String = "NORMAL", // SetType.name
+    @ColumnInfo(name = "set_type") val setType: SetType = SetType.NORMAL,
     val reps: Int? = null,                       // only when measure_type == REPS
     @ColumnInfo(name = "duration_sec") val durationSec: Int? = null, // only when DURATION
     @ColumnInfo(name = "external_load_kg") val externalLoadKg: Double = 0.0,

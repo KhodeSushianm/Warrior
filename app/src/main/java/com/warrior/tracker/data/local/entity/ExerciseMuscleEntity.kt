@@ -5,6 +5,8 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import com.warrior.tracker.core.common.Muscle
+import com.warrior.tracker.core.common.MuscleRole
 
 /**
  * `exercise_muscles` — sec.10.9. Composite PK (exercise_id, muscle).
@@ -25,6 +27,6 @@ import androidx.room.PrimaryKey
 )
 data class ExerciseMuscleEntity(
     @ColumnInfo(name = "exercise_id") val exerciseId: String,
-    val muscle: String, // Muscle.name
-    val role: String,   // MuscleRole.name
+    val muscle: Muscle,
+    val role: MuscleRole,
 )

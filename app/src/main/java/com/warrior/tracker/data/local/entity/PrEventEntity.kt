@@ -4,6 +4,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import com.warrior.tracker.core.common.PRType
 
 /**
  * `pr_events` (Cache) — sec.10.13. One row per personal-record event;
@@ -18,7 +19,7 @@ import androidx.room.PrimaryKey
 data class PrEventEntity(
     @PrimaryKey val id: String,
     @ColumnInfo(name = "exercise_id") val exerciseId: String,
-    @ColumnInfo(name = "pr_type") val prType: String, // PRType.name
+    @ColumnInfo(name = "pr_type") val prType: PRType,
     val value: Double,
     val reps: Int? = null, // for REPS_AT_WEIGHT / BEST_E1RM
     @ColumnInfo(name = "set_id") val setId: String? = null, // may be deleted later

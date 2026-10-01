@@ -4,6 +4,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import com.warrior.tracker.core.common.WorkoutStatus
 
 /**
  * `workouts` table — ARCHITECTURE.md sec.10.4.
@@ -22,7 +23,8 @@ data class WorkoutEntity(
     @ColumnInfo(name = "ended_at") val endedAt: Long? = null,
     @ColumnInfo(name = "local_date") val localDate: String,
     @ColumnInfo(name = "timezone_id") val timezoneId: String,
-    val status: String, // WorkoutStatus.name — converter maps enum <-> TEXT
+    /** Stored as TEXT `WorkoutStatus.name` via DatabaseConverters (sec.10.16). */
+    val status: WorkoutStatus,
     @ColumnInfo(name = "active_duration_sec") val activeDurationSec: Long? = null,
     @ColumnInfo(name = "session_rpe") val sessionRpe: Double? = null,
     @ColumnInfo(name = "body_weight_kg_snapshot") val bodyWeightKgSnapshot: Double? = null,

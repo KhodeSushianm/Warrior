@@ -24,8 +24,12 @@ import com.warrior.tracker.data.local.entity.SetEntity
 import com.warrior.tracker.data.local.entity.WorkoutEntity
 
 /**
- * V1 schema — 10 tables (sec.10.3). exportSchema = true; JSONs land in docs/schemas (sec.5, sec.12).
- * Version starts at 1; every future change gets an explicit Migration (sec.10.16).
+ * V1 schema — 10 tables (sec.10.3). `exportSchema = true`; the JSON is written to
+ * `<repo>/docs/schemas/…` by the `room.schemaLocation` KSP arg and is tracked in Git (sec.12),
+ * which is what the Phase-5 `MigrationTestHelper` reads.
+ *
+ * Version starts at 1; every future change gets an explicit Migration and a committed schema JSON
+ * (sec.10.16). `fallbackToDestructiveMigration` is forbidden by sec.12 and is not configured.
  */
 @Database(
     entities = [

@@ -5,6 +5,8 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import com.warrior.tracker.core.common.ActivityType
+import com.warrior.tracker.core.common.BoxingType
 
 /**
  * `activities` — sec.10.5. The single middle layer between Workout and Set/Round.
@@ -36,9 +38,9 @@ data class ActivityEntity(
     @PrimaryKey val id: String,
     @ColumnInfo(name = "workout_id") val workoutId: String,
     @ColumnInfo(name = "order_index") val orderIndex: Int,
-    val type: String, // ActivityType.name
+    val type: ActivityType,
     @ColumnInfo(name = "exercise_id") val exerciseId: String? = null, // STRENGTH only
-    @ColumnInfo(name = "boxing_type") val boxingType: String? = null, // BOXING only
+    @ColumnInfo(name = "boxing_type") val boxingType: BoxingType? = null, // BOXING only
     @ColumnInfo(name = "custom_name") val customName: String? = null,
     val notes: String? = null,
 )

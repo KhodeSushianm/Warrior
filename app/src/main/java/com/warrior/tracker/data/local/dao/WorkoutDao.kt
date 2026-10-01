@@ -6,6 +6,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
+import com.warrior.tracker.core.common.ActivityType
 import com.warrior.tracker.data.local.entity.WorkoutEntity
 import kotlinx.coroutines.flow.Flow
 
@@ -27,6 +28,16 @@ interface WorkoutDao {
 
     @Query("SELECT * FROM workouts WHERE local_date = :localDate ORDER BY started_at DESC")
     fun getWorkoutsByDate(localDate: String): Flow<List<WorkoutEntity>>
+
+    /** Completed workouts on a date — what History/Calendar actually render (sec.10.19). */
+    @Query(
+        """
+        SELECT * FROM workouts
+        WHERE local_date = :localDate AND status = 'COMPLETED'
+        ORDER BY started_at DESC
+        """
+    )
+    fun getCompletedWorkoutsByDate(localDate: String): Flow<List<WorkoutEntity>>
 
     @Query(
         """
@@ -84,5 +95,5 @@ interface WorkoutDao {
         WHERE w.status = 'COMPLETED' AND a.type = :type AND w.local_date BETWEEN :from AND :to
         """
     )
-    fun countSessionsWithType(from: String, to: String, type: String): Flow<Int>
+    fun countSessionsWithType(from: String, to: String, type: ActivityType): Flow<Int>
 }

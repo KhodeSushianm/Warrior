@@ -44,6 +44,22 @@ android {
     buildFeatures {
         compose = true
     }
+
+    lint {
+        // Non-blocking for now on purpose: the report is published as a CI artifact so findings are
+        // visible, but a newly-added check must not be able to turn the phase gate (sec.16: green
+        // build + installable APK) red on an unrelated rule. Phase 6 flips abortOnError to true
+        // once a lint baseline has been committed.
+        abortOnError = false
+        warningsAsErrors = false
+        checkReleaseBuilds = false
+        xmlReport = true
+        htmlReport = true
+        // Correctness issues that matter for a local-first, offline, RTL app.
+        error += setOf("MissingTranslation", "ExtraTranslation", "FullBackupContent", "NewApi", "RtlHardcoded")
+        disable += setOf("GradleDependency", "AndroidGradlePluginVersion")
+    }
+
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.14"
     }
@@ -55,9 +71,12 @@ android {
     }
 }
 
-// Room schema export — required by ARCHITECTURE.md (exportSchema = true).
+// Room schema export — required by ARCHITECTURE.md sec.12 ("نگهداری Schemaها در Git") and by
+// the Phase-5 MigrationTestHelper. The path MUST resolve inside the repository: the Phase-0 value
+// "$projectDir/../../docs/schemas" resolved to <repo>/../docs/schemas, i.e. one level ABOVE the
+// project root, so the JSON was written outside the working tree and never committed.
 ksp {
-    arg("room.schemaLocation", "$projectDir/../../docs/schemas")
+    arg("room.schemaLocation", "$rootDir/docs/schemas")
     arg("room.incremental", "true")
 }
 
