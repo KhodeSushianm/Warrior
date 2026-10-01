@@ -2,10 +2,25 @@
 .gradle/
 build/
 local.properties
+.kotlin/
+captures/
+*.apk
+*.aab
+*.ap_
+*.dex
+app/release/
+
+# Room schema JSONs under docs/schemas are DELIBERATELY tracked (sec.12) — do not ignore them.
+
+# JVM crash dumps (the Phase-0 build OOM-crashed the Gradle daemon and left these in the repo root)
+hs_err_pid*.log
+replay_pid*.log
+*.hprof
 
 # IDEs
 .idea/
 *.iml
+.DS_Store
 
 # OS
-.DS_Store
+Thumbs.db

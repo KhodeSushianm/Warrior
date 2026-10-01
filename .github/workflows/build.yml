@@ -17,7 +17,7 @@ jobs:
   build:
     name: Assemble Debug + Unit Tests
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 40
 
     steps:
       - name: Checkout
@@ -32,6 +32,8 @@ jobs:
       - name: Setup Gradle (wrapper cache)
         uses: gradle/actions/setup-gradle@v3
         with:
+          # Optional: only takes effect when the repository secret is configured. An unset secret
+          # resolves to an empty string, which setup-gradle treats as "no encryption key".
           cache-encryption-key: ${{ secrets.GRADLE_CACHE_ENCRYPTION_KEY }}
 
       - name: Grant execute permission for gradlew
@@ -40,8 +42,31 @@ jobs:
       - name: Unit tests
         run: ./gradlew :app:testDebugUnitTest --stacktrace
 
+      - name: Android Lint
+        run: ./gradlew :app:lintDebug --stacktrace
+
       - name: Assemble debug APK
         run: ./gradlew :app:assembleDebug --stacktrace
+
+      # Guards the sec.12 requirement that Room schemas are kept in Git. Phase 0 exported them to
+      # "$projectDir/../../docs/schemas", i.e. one level ABOVE the repository root, so the JSON was
+      # written outside the working tree and never committed. If this step fails, either the schema
+      # moved again or a schema change was made without committing the regenerated JSON.
+      - name: Verify Room schema is committed and up to date
+        run: |
+          set -euo pipefail
+          SCHEMA_DIR="docs/schemas/com.warrior.tracker.data.local.database.AppDatabase"
+          test -f "$SCHEMA_DIR/1.json" || {
+            echo "::error::Room schema JSON not found at $SCHEMA_DIR/1.json"
+            echo "Check the room.schemaLocation KSP arg in app/build.gradle.kts — it must resolve inside the repository."
+            exit 1
+          }
+          if ! git diff --quiet -- docs/schemas; then
+            echo "::error::Room schema JSON is stale — regenerate and commit docs/schemas."
+            git --no-pager diff --stat -- docs/schemas
+            exit 1
+          fi
+          echo "Room schema committed and up to date."
 
       - name: Upload test results
         if: always()
@@ -50,6 +75,16 @@ jobs:
           name: unit-test-results
           path: app/build/test-results/**/*.xml
           retention-days: 14
+          if-no-files-found: warn
+
+      - name: Upload lint report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lint-report
+          path: app/build/reports/lint-results-debug.*
+          retention-days: 14
+          if-no-files-found: warn
 
       - name: Upload debug APK
         uses: actions/upload-artifact@v4
