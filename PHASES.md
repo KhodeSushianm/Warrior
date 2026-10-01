@@ -165,19 +165,38 @@ _(با تکمیل هر فاز، یک بخش «گزارش» شامل تغییرا
 - `./gradlew :app:kspDebugKotlin` → سبز؛ `docs/schemas/…/1.json` داخل ریپو تولید شد
 - diff Schema: تنها `exercise_daily_stats` تغییر کرد (حذف ایندکس تکراری)؛ `identityHash` از `06a8f098…` به `ec1650f0…` تغییر کرد که برای نسخه‌ی ۱ بدون کاربر بی‌خطر است
 - اثبات رفع باگ ۶: ارجاع به `DatabaseConverters` در کد تولیدشده‌ی Room از **۰ → ۱۸ مورد** در ۶ فایل `*_Impl.java` رسید
-- GitHub Actions Run #3 روی `d221ec7`: **هر ۱۶ گام سبز** (Unit tests · Android Lint · assembleDebug · گارد Schema · سه artifact). تأیید از خودِ artifact تست: **۷۵ تست، ۰ خطا، ۰ skip** (پس از افزودن `ClockTest` و `ExerciseDaoQueryTest` می‌شود ۸۵)
-- لینک Actions: https://github.com/KhodeSushianm/Warrior/actions/runs/36873224311
+- **GitHub Actions روی `a26a3da`: هر ۱۶ گام سبز** (Unit tests · Android Lint · assembleDebug · گارد Schema · سه artifact)
+  - لینک: https://github.com/KhodeSushianm/Warrior/actions/runs/36877625621
+  - تأیید از خودِ artifact تست CI (نه از اجرای محلی):
 
-### نتیجه‌ی Lint پس از رفع‌ها
+    | کلاس تست | تعداد | خطا | skip |
+    |---|---|---|---|
+    | JalaliTest | ۲۰ | ۰ | ۰ |
+    | GoalCalculatorTest | ۱۱ | ۰ | ۰ |
+    | PrCalculatorTest | ۱۱ | ۰ | ۰ |
+    | InputValidatorTest | ۱۰ | ۰ | ۰ |
+    | EnumsTest | ۸ | ۰ | ۰ |
+    | VolumeCalculatorTest | ۶ | ۰ | ۰ |
+    | ClockTest | ۵ | ۰ | ۰ |
+    | ExerciseDaoQueryTest | ۵ | ۰ | ۰ |
+    | IntensityCalculatorTest | ۵ | ۰ | ۰ |
+    | NumberInputParserTest | ۴ | ۰ | ۰ |
+    | **جمع** | **۸۵** | **۰** | **۰** |
 
-`abortOnError = false` است (تا یک قاعده‌ی تازه‌افزوده‌شده نتواند دروازه‌ی فاز را قرمز کند) ولی گزارش به‌عنوان artifact منتشر می‌شود. وضعیت: **۰ خطا**، و از ۱۵ مورد اولیه فقط این هشدارها باقی ماند:
+  - Artifact اپ: `warrior-debug-apk` (۱۶٫۵۲ مگابایت)
 
-| هشدار | تعداد | وضعیت |
+### نتیجه‌ی Lint
+
+از **۱۵ مورد (۱ خطا)** در ابتدای بازبینی به **۱ مورد (۰ خطا)** رسید:
+
+| یافته | تعداد اولیه | وضعیت |
 |---|---|---|
-| `NewApi` (خطا) | ۱ | ✅ رفع شد (باگ ۳۸) |
-| `MissingApplicationIcon` | ۱ | ✅ رفع شد (باگ ۳۹) |
-| `UnusedResources` | ۴ | ✅ رفع شد (باگ ۳۹ + ۴۱) |
-| `ObsoleteSdkInt` | ۱ | ✅ رفع شد (باگ ۴۰) |
-| `RedundantLabel` / `UnusedAttribute` | ۲ | ✅ رفع شد (باگ ۴۲) |
-| `IconLauncherShape` | ۵ | ⏸ به فاز ۶ موکول شد: بازطراحی آیکون یک کار گرافیکی است، نه رفع باگ؛ ضمناً در API 26+ adaptive icon اولویت دارد. در `lint { disable }` مستند شد |
-| `OldTargetApi` (targetSdk 34) | ۱ | ⏸ عمداً نگه داشته شد به‌عنوان سیگنال صادقانه؛ ارتقا در فاز ۶ |
+| `NewApi` (**خطا**) | ۱ | ✅ رفع شد — باگ ۳۸، کرش روی اندروید ۸ تا ۱۳ |
+| `MissingApplicationIcon` | ۱ | ✅ رفع شد — باگ ۳۹ |
+| `UnusedResources` | ۴ | ✅ رفع شد — باگ ۳۹ و ۴۱ |
+| `ObsoleteSdkInt` | ۱ | ✅ رفع شد — باگ ۴۰ |
+| `RedundantLabel` / `UnusedAttribute` | ۲ | ✅ رفع شد — باگ ۴۲ |
+| `IconLauncherShape` | ۵ | ⏸ موکول به فاز ۶: بازطراحی آیکون کار گرافیکی است نه رفع باگ؛ در API 26+ هم adaptive icon اولویت دارد. در `lint { disable }` مستند شد |
+| `OldTargetApi` (targetSdk 34) | ۱ | ⏸ عمداً روشن نگه داشته شد به‌عنوان سیگنال صادقانه؛ ارتقا در فاز ۶ |
+
+`abortOnError` فعلاً `false` است تا یک قاعده‌ی تازه‌افزوده‌شده نتواند دروازه‌ی فاز (§16: بیلد سبز + APK قابل نصب) را بی‌ربط قرمز کند؛ گزارش به‌عنوان artifact منتشر می‌شود. در فاز ۶ همراه با commit شدن baseline به `true` تبدیل می‌شود.
