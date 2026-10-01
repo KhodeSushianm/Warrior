@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Warrior</string>
+
+    <!-- Navigation -->
+    <string name="nav_home">Home</string>
+    <string name="nav_workouts">Workouts</string>
+    <string name="nav_history">History</string>
+    <string name="nav_progress">Progress</string>
+    <string name="nav_settings">Settings</string>
+
+    <!-- Home -->
+    <string name="home_title">Warrior</string>
+    <string name="home_subtitle">Boxing &amp; Strength tracker — all data stays on this device.</string>
+    <string name="home_start_workout">Start Workout</string>
+    <string name="home_no_workouts_yet">No workouts yet. Start your first one!</string>
+
+    <!-- Settings -->
+    <string name="settings_theme">Theme</string>
+    <string name="settings_theme_system">Follow system</string>
+    <string name="settings_theme_light">Light</string>
+    <string name="settings_theme_dark">Dark</string>
+    <string name="settings_language">Language</string>
+    <string name="settings_language_system">System default</string>
+    <string name="settings_language_en">English</string>
+    <string name="settings_language_fa">فارسی</string>
+    <string name="settings_calendar">Calendar</string>
+    <string name="settings_auto">Auto</string>
+    <string name="settings_jalali">Jalali</string>
+    <string name="settings_gregorian">Gregorian</string>
+    <string name="settings_digits">Digits</string>
+    <string name="settings_digits_latin">Latin</string>
+    <string name="settings_digits_persian">Persian</string>
+    <string name="settings_back">Back</string>
+
+    <!-- Phase 0 shell -->
+    <string name="settings_open">Settings</string>
+    <string name="coming_soon_phase_1">Coming in Phase 1: workout logging.</string>
+    <string name="coming_soon_phase_2">Coming in Phase 2: boxing rounds.</string>
+    <string name="coming_soon_phase_3">Coming in Phase 3: history &amp; calendar.</string>
+    <string name="coming_soon_phase_4">Coming in Phase 4: progress charts, goals and body weight.</string>
+</resources>

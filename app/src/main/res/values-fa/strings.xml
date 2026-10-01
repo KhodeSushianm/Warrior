@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">وریور</string>
+
+    <!-- Navigation -->
+    <string name="nav_home">خانه</string>
+    <string name="nav_workouts">تمرین‌ها</string>
+    <string name="nav_history">تاریخچه</string>
+    <string name="nav_progress">پیشرفت</string>
+    <string name="nav_settings">تنظیمات</string>
+
+    <!-- Home -->
+    <string name="home_title">وریور</string>
+    <string name="home_subtitle">ردیاب بوکس و قدرتی — همه‌ی داده‌ها روی همین دستگاه می‌مانند.</string>
+    <string name="home_start_workout">شروع تمرین</string>
+    <string name="home_no_workouts_yet">هنوز تمرینی ثبت نشده. اولین تمرینت را شروع کن!</string>
+
+    <!-- Settings -->
+    <string name="settings_theme">پوسته</string>
+    <string name="settings_theme_system">همراه سیستم</string>
+    <string name="settings_theme_light">روشن</string>
+    <string name="settings_theme_dark">تیره</string>
+    <string name="settings_language">زبان</string>
+    <string name="settings_language_system">پیش‌فرض سیستم</string>
+    <string name="settings_language_en">English</string>
+    <string name="settings_language_fa">فارسی</string>
+    <string name="settings_calendar">تقویم</string>
+    <string name="settings_auto">خودکار</string>
+    <string name="settings_jalali">شمسی</string>
+    <string name="settings_gregorian">میلادی</string>
+    <string name="settings_digits">ارقام</string>
+    <string name="settings_digits_latin">لاتین</string>
+    <string name="settings_digits_persian">فارسی</string>
+    <string name="settings_back">بازگشت</string>
+
+    <!-- پوسته فاز ۰ -->
+    <string name="settings_open">تنظیمات</string>
+    <string name="coming_soon_phase_1">فاز ۱: ثبت تمرین، به‌زودی.</string>
+    <string name="coming_soon_phase_2">فاز ۲: راندهای بوکس، به‌زودی.</string>
+    <string name="coming_soon_phase_3">فاز ۳: تاریخچه و تقویم، به‌زودی.</string>
+    <string name="coming_soon_phase_4">فاز ۴: نمودارهای پیشرفت، هدف‌ها و وزن بدن، به‌زودی.</string>
+</resources>

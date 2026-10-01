@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Auto Backup rules for Android 12+ (ARCHITECTURE.md sec.12).
+     Room DB + DataStore are backed up; nothing leaves the device via network. -->
+<data-extraction-rules>
+    <cloud-backup>
+        <exclude domain="rootdir" path="." />
+        <include domain="database" path="." />
+        <include domain="sharedpref" path="." />
+    </cloud-backup>
+    <device-transfer>
+        <include domain="database" path="." />
+        <include domain="sharedpref" path="." />
+    </device-transfer>
+</data-extraction-rules>
