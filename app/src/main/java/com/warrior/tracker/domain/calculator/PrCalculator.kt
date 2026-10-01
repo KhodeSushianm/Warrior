@@ -40,12 +40,19 @@ object PrCalculator {
             if (!measureTypeIsDuration && reps != null) reps.toDouble() else null
 
         PRType.BEST_E1RM ->
-            if (!measureTypeIsDuration && reps != null && reps in 1..12) {
-                if (reps == 1) externalLoadKg else Epley.e1rm(externalLoadKg, reps)
+            // Load-based by definition (the Epley formula's `w` is the external load): requiring
+            // loadTypeApplies stops BODYWEIGHT/ASSISTED exercises from generating value-0 PR rows
+            // that can never be beaten and only pollute the pr_events cache (sec.10.13).
+            if (loadTypeApplies && !measureTypeIsDuration && reps != null && reps in 1..12) {
+                Epley.e1rm(externalLoadKg, reps)
             } else null
 
         PRType.BEST_SET_VOLUME ->
-            if (loadTypeApplies && reps != null) externalLoadKg * reps else null
+            // sec.7.3 restricts this to WEIGHTED / BODYWEIGHT_PLUS; DURATION-measured sets have no
+            // reps-derived volume, and mirroring VolumeCalculator.setVolume keeps the two in sync.
+            if (loadTypeApplies && !measureTypeIsDuration && reps != null && reps >= 1) {
+                externalLoadKg * reps
+            } else null
 
         PRType.MAX_DURATION ->
             if (measureTypeIsDuration) (durationSec?.toDouble()) else null
