@@ -15,7 +15,7 @@
 
 | فاز | عنوان | خروجی قابل تحویل | وضعیت |
 |---|---|---|---|
-| ۰ | پایه | پروژه Gradle KTS + Compose/M3 + Hilt + Room Schema کامل (۱۰ جدول) + Theme دوتیره + Localization FA/RTL/شمسی + CI Actions (build+test+APK artifact) + تست‌های پایه | ✅ تکمیل + بازبینی و رفع ۳۷ باگ (۷۵ تست سبز) |
+| ۰ | پایه | پروژه Gradle KTS + Compose/M3 + Hilt + Room Schema کامل (۱۰ جدول) + Theme دوتیره + Localization FA/RTL/شمسی + CI Actions (build+test+APK artifact) + تست‌های پایه | ✅ تکمیل + بازبینی و رفع ۴۳ باگ (۸۰ تست، CI سبز) |
 | ۱ | هسته‌ی ثبت | Workout Draft (ذخیره مرحله‌ای)، ثبت Strength، Fast Input، TimerEngine + Foreground Service | ⬜ |
 | ۲ | Boxing | Activityهای Boxing، Round/Rest Timer، ثبت دستی Rounds | ⬜ |
 | ۳ | مرور | History (List/Calendar شمسی)، صفحه جزئیات، ویرایش، حذف با Undo | ⬜ |
@@ -29,6 +29,8 @@ _(با تکمیل هر فاز، یک بخش «گزارش» شامل تغییرا
 
 > **یادداشت:** پیش از شروع فاز ۱، فاز ۰ به‌طور کامل بازبینی و ۳۷ باگ آن رفع شد.
 > جزئیات، شواهد و موارد عمداً رفع‌نشده در «گزارش بازبینی و رفع باگ فاز ۰» در انتهای همین فایل آمده است.
+> یک نکته‌ی مهم: باگ شماره‌ی ۳۸ (`LocalDate.ofInstant` → کرش روی اندروید ۸ تا ۱۳) فقط به‌خاطر افزودن گام Lint به CI کشف شد؛
+> یعنی ارزش خودِ گام Lint در همین بازبینی ثابت شد.
 
 ---
 
@@ -58,7 +60,7 @@ _(با تکمیل هر فاز، یک بخش «گزارش» شامل تغییرا
 
 ## گزارش بازبینی و رفع باگ فاز ۰ — انجام شد ✅
 
-بازبینی کامل فاز ۰ (۵۱ فایل Kotlin، ۹ فایل XML، Gradle، CI) انجام و **۳۷ باگ/نقص** رفع شد.
+بازبینی کامل فاز ۰ (۵۱ فایل Kotlin، ۹ فایل XML، Gradle، CI) انجام و **۴۳ باگ/نقص** رفع شد.
 معیار قبولی طبق قوانین بالا: تست‌ها سبز + بیلد موفق.
 
 ### روش راستی‌آزمایی
@@ -73,7 +75,8 @@ _(با تکمیل هر فاز، یک بخش «گزارش» شامل تغییرا
 | تولید کد Room/Hilt | `./gradlew :app:kspDebugKotlin` | **سبز** |
 | پایداری Schema | diff بایت‌به‌بایت `1.json` قبل/بعد | **۹ از ۱۰ جدول کاملاً یکسان** |
 | موتور تقویم | مقایسه با الگوریتم مرجع jalaali روی ۷۳٬۴۱۴ تاریخ | **۰ اختلاف** |
-| بیلد کامل + APK | GitHub Actions | (در همین Push اجرا می‌شود) |
+| بیلد کامل + APK + Lint | GitHub Actions | **سبز** (Run #3) |
+| Lint | `:app:lintDebug` در CI + بررسی گزارش | **۱ خطای NewApi پیدا و رفع شد** (شماره‌ی ۳۸) |
 
 ### باگ‌های بحرانی
 
@@ -84,6 +87,11 @@ _(با تکمیل هر فاز، یک بخش «گزارش» شامل تغییرا
 | ۳ | **`toJalali()` تاریخ ناممکن تولید می‌کرد** | `2072-03-21 → JalaliDate(1450, **13**, 1)` و `2072-03-22 → (1450, 11, 14)` یعنی **حرکت به عقب در زمان** | مرز جدول با طول واقعی سال کنترل می‌شود + جست‌وجوی دودویی؛ `init` کلاس `JalaliDate` اکنون ماه/روز نامعتبر را با استثنا رد می‌کند. ۰ خروجی نامعتبر در پویش ۱۸۸۰–۲۱۳۰ |
 | ۴ | **`format()` به Locale وابسته بود** | با `Locale=ar` خروجی «ارقام فارسی» شد `١٤٠٥` (U+0661 عربی) نه `۱۴۰۵` (U+06F1 فارسی)؛ با `Locale=fa` پارامتر `persianDigits=false` نادیده گرفته می‌شد | `String.format(Locale.ROOT, …)`؛ تست روی ۹ زبان |
 | ۵ | **تغییر زبان روی اندروید ۱۲ و پایین‌تر بی‌اثر بود** | `MainActivity : ComponentActivity` در حالی‌که `AppCompatDelegate.setApplicationLocales` فقط توسط `AppCompatActivity` اعمال می‌شود؛ `android:localeConfig` هم وجود نداشت؛ تم هم `android:Theme.Material` بود | `AppCompatActivity` + تم `Theme.AppCompat.DayNight.NoActionBar` + `res/xml/locales_config.xml` + بازیابی زبان از DataStore هنگام start سرد (§13) |
+| ۳۸ | **`Clock.localDateToday()` روی اندروید ۸ تا ۱۳ کرش می‌کرد** — `LocalDate.ofInstant` فقط از **API 34** وجود دارد ولی minSdk برابر ۲۶ است؛ بدون desugaring یعنی `NoSuchMethodError`. این همان تابعی است که `workouts.local_date` را می‌سازد، یعنی **هر** ثبت تمرین روی اکثر دستگاه‌های واقعی می‌ترکید. چون هیچ‌کس صدايش نمی‌زد و Lint هم اجرا نمی‌شد، در فاز ۰ دیده نشد — **توسط گام Lint جدید در همین بازبینی کشف شد** | `now().atZone(zone).toLocalDate()` (هر دو API 26) + ارتقای `NewApi` به severity خطا در Lint + تست جدید `ClockTest` |
+| ۳۹ | **آیکون اپ در Manifest اعلام نشده بود** (`MissingApplicationIcon`) → اپ با آیکون پیش‌فرض اندروید نصب می‌شد و در نتیجه `ic_launcher_background`، `ic_launcher_foreground` و هر ۵ فایل PNG آیکون **بلااستفاده** بودند | افزودن `android:icon="@mipmap/ic_launcher"`؛ زنجیره‌ی adaptive icon وصل شد |
+| ۴۰ | `mipmap-anydpi-v26` با minSdk=26 بی‌معنا بود (`ObsoleteSdkInt`) | تغییر نام به `mipmap-anydpi` |
+| ۴۱ | رشته‌ی `coming_soon_phase_2` در هر دو زبان تعریف شده بود ولی هیچ صفحه‌ای مصرفش نمی‌کرد (`UnusedResources`) | حذف؛ در فاز ۲ همراه با صفحه‌ی Boxing برمی‌گردد |
+| ۴۲ | `android:label` روی Activity تکراری بود (`RedundantLabel`) و `localeConfig` هشدار `UnusedAttribute` می‌گرفت | حذف label اضافی + `tools:targetApi="tiramisu"` |
 | ۶ | **`DatabaseConverters` کاملاً کد مُرده بود** | `grep -ro DatabaseConverters` روی **کل** کد تولیدشده‌ی KSP → **۰ مورد**. همه‌ی ستون‌های enum به‌صورت `String` آزاد بودند و DAOها literal داشتند | تایپ شدن همه‌ی ستون‌های enum در هر ۱۰ entity + پارامترهای DAO. نتیجه: ۹ از ۱۰ جدول بایت‌به‌بایت یکسان ماند (فقط نوع Kotlin عوض شد، ستون همچنان TEXT). نقض §6.7/§10.16 برطرف شد |
 
 ### باگ‌های مهم
@@ -136,19 +144,39 @@ _(با تکمیل هر فاز، یک بخش «گزارش» شامل تغییرا
 | استفاده نکردن از `android.icu.util.PersianCalendar` (§5 و §13) | **انحراف عمدی و بهتر**: تقویم ICU وابسته به OEM/Locale است، ولی موتور纯 Kotlin روی همه‌ی دستگاه‌ها یکسان است. پیشنهاد: اصلاح §5/§13 سند |
 | وزن `1` برای Round با مدت صفر/نامعلوم در `IntensityCalculator` | انحراف از میانگین وزنی خالص §7.2 (اختلاط عدد بی‌بعد با ثانیه)؛ رفتار مستند و تست‌شده است و تغییرش تصمیم محصولی است |
 | پارامتر بلااستفاده‌ی `durationSec` در `VolumeCalculator.setVolume` | برای تقارن محل فراخوانی نگه داشته شد؛ فقط warning کامپایلر |
-| `targetSdk 34` / AGP 8.5.2 / Compose BOM 2024.06 | یک نسل عقب‌تر از زمان بازبینی؛ به‌روزرسانی، ریسک مستقل خودش را دارد و بهتر است در فاز ۶ انجام شود |
+| `targetSdk 34` / AGP 8.5.2 / Compose BOM 2024.06 | یک نسل عقب‌تر از زمان بازبینی؛ به‌روزرسانی، ریسک مستقل خودش را دارد و بهتر است در فاز ۶ انجام شود (هشدار `OldTargetApi` عمداً روشن نگه داشته شد) |
+| شکل آیکون‌های Launcher (`IconLauncherShape`) | بازطراحی گرافیکی است نه رفع باگ؛ در API 26+ لایه‌ی adaptive icon اولویت دارد. به فاز ۶ موکول و در پیکربندی Lint مستند شد |
+| `abortOnError = false` در Lint | تا وقتی baseline نداشته باشیم، یک قاعده‌ی تازه می‌تواند دروازه‌ی فاز (§16) را بی‌ربط قرمز کند. در فاز ۶ با commit شدن baseline به `true` تبدیل می‌شود |
 
 ### آزمون‌ها
 
-- **۳۳ → ۷۵ تست** (۴۲ تست جدید)، همه سبز.
+- **۳۳ → ۸۰ تست** (۴۷ تست جدید)، همه سبز.
 - `JalaliTest` (جدید، ۱۸ تست): Nowruzهای منتشرشده، سال‌های کبیسه‌ی AP 1330..1459 از الگوریتم مرجع، مرزهای دقیق جدول، پویش ۱۸۸۰–۲۱۳۰ برای «هرگز ماه/روز ناممکن نده»، رفت‌وبرگشت Gregorian↔Jalali روی ۷۳٬۴۱۴ روز، رفت‌وبرگشت همه‌ی تاریخ‌های معتبر AP 1340..1450، مستقل بودن `format()` از ۹ زبان، نام روزها و ماه‌ها، طول ماه‌ها، و تست regression عملکرد.
 - `EnumsTest` (جدید، ۸ تست): پارس امن، `fromTag`، شروع هفته، حل `AUTO`، RTL، و **تست پایداری `name` همه‌ی enumها** (چون §10.16 ذخیره بر پایه‌ی `name` است، تغییر نام = migration).
+- `ClockTest` (جدید، ۵ تست): edge case الزامی §16 یعنی «جابه‌جایی Timezone» — یک instant واحد در UTC/تهران/نیویورک/Kiritimati، پویش ساعت‌به‌ساعت یک روز کامل در چهار zone، سناریوی ثبت تمرین دقیقاً قبل از نیمه‌شب، و رفت‌وبرگشت `local_date` با لایه‌ی نمایش شمسی. همراه با `FixedClock` در سورس تست (تا در APK release نرود).
 - `InputValidatorTest` بازنویسی: هر کران از **هر دو سمت**، NaN/بی‌نهایت، و تطابق ثابت‌ها با جدول §15.
 - `GoalCalculatorTest` و `PrCalculatorTest` گسترش یافتند.
 
 ### شواهد Build/Test
 
-- `kotlinc + JUnit` روی کل `domain`/`core` → `OK (75 tests)`
+- `kotlinc + JUnit` روی کل `domain`/`core` → `OK (80 tests)`
 - type-check هر ۵۱ فایل main با classpath کامل Android → `0 frontend errors`
 - `./gradlew :app:kspDebugKotlin` → سبز؛ `docs/schemas/…/1.json` داخل ریپو تولید شد
 - diff Schema: تنها `exercise_daily_stats` تغییر کرد (حذف ایندکس تکراری)؛ `identityHash` از `06a8f098…` به `ec1650f0…` تغییر کرد که برای نسخه‌ی ۱ بدون کاربر بی‌خطر است
+- اثبات رفع باگ ۶: ارجاع به `DatabaseConverters` در کد تولیدشده‌ی Room از **۰ → ۱۸ مورد** در ۶ فایل `*_Impl.java` رسید
+- GitHub Actions Run #3 روی `d221ec7`: **هر ۱۶ گام سبز** (Unit tests · Android Lint · assembleDebug · گارد Schema · سه artifact). تأیید از خودِ artifact تست: **۷۵ تست، ۰ خطا، ۰ skip** (پس از افزودن `ClockTest` می‌شود ۸۰)
+- لینک Actions: https://github.com/KhodeSushianm/Warrior/actions/runs/36873224311
+
+### نتیجه‌ی Lint پس از رفع‌ها
+
+`abortOnError = false` است (تا یک قاعده‌ی تازه‌افزوده‌شده نتواند دروازه‌ی فاز را قرمز کند) ولی گزارش به‌عنوان artifact منتشر می‌شود. وضعیت: **۰ خطا**، و از ۱۵ مورد اولیه فقط این هشدارها باقی ماند:
+
+| هشدار | تعداد | وضعیت |
+|---|---|---|
+| `NewApi` (خطا) | ۱ | ✅ رفع شد (باگ ۳۸) |
+| `MissingApplicationIcon` | ۱ | ✅ رفع شد (باگ ۳۹) |
+| `UnusedResources` | ۴ | ✅ رفع شد (باگ ۳۹ + ۴۱) |
+| `ObsoleteSdkInt` | ۱ | ✅ رفع شد (باگ ۴۰) |
+| `RedundantLabel` / `UnusedAttribute` | ۲ | ✅ رفع شد (باگ ۴۲) |
+| `IconLauncherShape` | ۵ | ⏸ به فاز ۶ موکول شد: بازطراحی آیکون یک کار گرافیکی است، نه رفع باگ؛ ضمناً در API 26+ adaptive icon اولویت دارد. در `lint { disable }` مستند شد |
+| `OldTargetApi` (targetSdk 34) | ۱ | ⏸ عمداً نگه داشته شد به‌عنوان سیگنال صادقانه؛ ارتقا در فاز ۶ |

@@ -147,9 +147,16 @@ echo "sdk.dir=/path/to/android-sdk" > local.properties   # or set ANDROID_HOME
 ./gradlew :app:assembleDebug         # APK -> app/build/outputs/apk/debug/
 ```
 
-CI (`.github/workflows/build.yml`) runs the same three tasks on every push and PR, then verifies
-that the Room schema JSON under `docs/schemas/` is present and not stale, and publishes the unit
-test results, the lint report and the debug APK as artifacts.
+CI (`.github/workflows/build.yml`) runs those tasks on every push and PR, then verifies that the
+Room schema JSON under `docs/schemas/` is present and not stale, and publishes the unit test
+results, the lint report and the debug APK as artifacts.
+
+`NewApi`, `MissingTranslation`, `ExtraTranslation`, `FullBackupContent` and `RtlHardcoded` are
+promoted to lint **errors** because they matter for a minSdk-26, offline, bilingual RTL app.
+Lint still runs with `abortOnError = false` until a baseline is committed in Phase 6, so its report
+is published as an artifact rather than gating the build — but it already earned its place: it is
+what caught `LocalDate.ofInstant` (API 34 only) in `Clock.localDateToday`, which would have thrown
+`NoSuchMethodError` on every device below Android 14.
 
 > `gradle.properties` asks for a 2 GB Gradle heap. AGP 8.5 + KSP + Hilt + the Compose compiler
 > genuinely need it — the Phase-0 setting of 1 GB with an in-process Kotlin compiler crashed the

@@ -33,7 +33,6 @@
     <!-- پوسته فاز ۰ -->
     <string name="settings_open">تنظیمات</string>
     <string name="coming_soon_phase_1">فاز ۱: ثبت تمرین، به‌زودی.</string>
-    <string name="coming_soon_phase_2">فاز ۲: راندهای بوکس، به‌زودی.</string>
     <string name="coming_soon_phase_3">فاز ۳: تاریخچه و تقویم، به‌زودی.</string>
     <string name="coming_soon_phase_4">فاز ۴: نمودارهای پیشرفت، هدف‌ها و وزن بدن، به‌زودی.</string>
 </resources>

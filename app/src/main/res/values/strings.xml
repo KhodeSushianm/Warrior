@@ -38,7 +38,6 @@
     <!-- Phase 0 shell -->
     <string name="settings_open">Settings</string>
     <string name="coming_soon_phase_1">Coming in Phase 1: workout logging.</string>
-    <string name="coming_soon_phase_2">Coming in Phase 2: boxing rounds.</string>
     <string name="coming_soon_phase_3">Coming in Phase 3: history &amp; calendar.</string>
     <string name="coming_soon_phase_4">Coming in Phase 4: progress charts, goals and body weight.</string>
 </resources>
