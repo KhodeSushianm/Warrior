@@ -15,7 +15,7 @@
 
 | فاز | عنوان | خروجی قابل تحویل | وضعیت |
 |---|---|---|---|
-| ۰ | پایه | پروژه Gradle KTS + Compose/M3 + Hilt + Room Schema کامل (۱۰ جدول) + Theme دوتیره + Localization FA/RTL/شمسی + CI Actions (build+test+APK artifact) + تست‌های پایه | ✅ تکمیل (CI سبز) |
+| ۰ | پایه | پروژه Gradle KTS + Compose/M3 + Hilt + Room Schema کامل (۱۰ جدول) + Theme دوتیره + Localization FA/RTL/شمسی + CI Actions (build+test+APK artifact) + تست‌های پایه | ✅ تکمیل + بازبینی و رفع ۳۷ باگ (۷۵ تست سبز) |
 | ۱ | هسته‌ی ثبت | Workout Draft (ذخیره مرحله‌ای)، ثبت Strength، Fast Input، TimerEngine + Foreground Service | ⬜ |
 | ۲ | Boxing | Activityهای Boxing، Round/Rest Timer، ثبت دستی Rounds | ⬜ |
 | ۳ | مرور | History (List/Calendar شمسی)، صفحه جزئیات، ویرایش، حذف با Undo | ⬜ |
@@ -26,6 +26,9 @@
 ## گزارش فازها
 
 _(با تکمیل هر فاز، یک بخش «گزارش» شامل تغییرات، فایل‌های جدید، نتایج Build/Test و لینک Actions اضافه می‌شود.)_
+
+> **یادداشت:** پیش از شروع فاز ۱، فاز ۰ به‌طور کامل بازبینی و ۳۷ باگ آن رفع شد.
+> جزئیات، شواهد و موارد عمداً رفع‌نشده در «گزارش بازبینی و رفع باگ فاز ۰» در انتهای همین فایل آمده است.
 
 ---
 
@@ -50,3 +53,102 @@ _(با تکمیل هر فاز، یک بخش «گزارش» شامل تغییرا
 **لینک Actions:** https://github.com/KhodeSushianm/Warrior/actions/runs/36850464805 (Workflow ID: 36850464805)
 
 **Artifact APK:** warrior-debug-apk (17.3 MB) قابل دانلود از صفحه Summary این Run
+
+---
+
+## گزارش بازبینی و رفع باگ فاز ۰ — انجام شد ✅
+
+بازبینی کامل فاز ۰ (۵۱ فایل Kotlin، ۹ فایل XML، Gradle، CI) انجام و **۳۷ باگ/نقص** رفع شد.
+معیار قبولی طبق قوانین بالا: تست‌ها سبز + بیلد موفق.
+
+### روش راستی‌آزمایی
+
+چون سندباکس این بازبینی فقط ۱ گیگابایت رم داشت، بیلد کامل Gradle در آن OOM می‌شد. برای همین
+راستی‌آزمایی چندلایه انجام شد:
+
+| لایه | ابزار | نتیجه |
+|---|---|---|
+| منطق خالص دامنه | kotlinc 1.9.24 + JUnit 4.13.2 (خارج از Gradle) | **۷۵ تست سبز** (پیش از بازبینی: ۳۳) |
+| type-check کل اپ | kotlinc روی هر ۵۱ فایل main + classpath کامل Android/Compose/AAR | **۰ خطای frontend** |
+| تولید کد Room/Hilt | `./gradlew :app:kspDebugKotlin` | **سبز** |
+| پایداری Schema | diff بایت‌به‌بایت `1.json` قبل/بعد | **۹ از ۱۰ جدول کاملاً یکسان** |
+| موتور تقویم | مقایسه با الگوریتم مرجع jalaali روی ۷۳٬۴۱۴ تاریخ | **۰ اختلاف** |
+| بیلد کامل + APK | GitHub Actions | (در همین Push اجرا می‌شود) |
+
+### باگ‌های بحرانی
+
+| # | باگ | شواهد | رفع |
+|---|---|---|---|
+| ۱ | **Schema اتاق به بیرون از ریپو صادر می‌شد** — `"$projectDir/../../docs/schemas"` به `<repo>/../docs/schemas` حل می‌شد | فایل `1.json` واقعاً در `"$ARENA_WORKSPACE"/docs/…` ساخته شد، نه در ریپو؛ هیچ schema ای در Git نبود | `$rootDir/docs/schemas` + commit شدن `1.json` + گارد جدید در CI (§12: «نگهداری Schemaها در Git») |
+| ۲ | **`jalaliLeapByCycle()` برای همه‌ی سال‌ها `true` برمی‌گرداند** | ۱۷ اختلاف با الگوریتم مرجع در بازه‌ی AP 1330..1460؛ همه‌ی سال‌های بیرون جدول کبیسه گزارش می‌شدند | جایگزینی با الگوریتم رسمی زیرواحد ۳۳‌ساله‌ی ایرانی (`jalCal`)؛ اکنون ۰ اختلاف در AP 1280..1519 |
+| ۳ | **`toJalali()` تاریخ ناممکن تولید می‌کرد** | `2072-03-21 → JalaliDate(1450, **13**, 1)` و `2072-03-22 → (1450, 11, 14)` یعنی **حرکت به عقب در زمان** | مرز جدول با طول واقعی سال کنترل می‌شود + جست‌وجوی دودویی؛ `init` کلاس `JalaliDate` اکنون ماه/روز نامعتبر را با استثنا رد می‌کند. ۰ خروجی نامعتبر در پویش ۱۸۸۰–۲۱۳۰ |
+| ۴ | **`format()` به Locale وابسته بود** | با `Locale=ar` خروجی «ارقام فارسی» شد `١٤٠٥` (U+0661 عربی) نه `۱۴۰۵` (U+06F1 فارسی)؛ با `Locale=fa` پارامتر `persianDigits=false` نادیده گرفته می‌شد | `String.format(Locale.ROOT, …)`؛ تست روی ۹ زبان |
+| ۵ | **تغییر زبان روی اندروید ۱۲ و پایین‌تر بی‌اثر بود** | `MainActivity : ComponentActivity` در حالی‌که `AppCompatDelegate.setApplicationLocales` فقط توسط `AppCompatActivity` اعمال می‌شود؛ `android:localeConfig` هم وجود نداشت؛ تم هم `android:Theme.Material` بود | `AppCompatActivity` + تم `Theme.AppCompat.DayNight.NoActionBar` + `res/xml/locales_config.xml` + بازیابی زبان از DataStore هنگام start سرد (§13) |
+| ۶ | **`DatabaseConverters` کاملاً کد مُرده بود** | `grep -ro DatabaseConverters` روی **کل** کد تولیدشده‌ی KSP → **۰ مورد**. همه‌ی ستون‌های enum به‌صورت `String` آزاد بودند و DAOها literal داشتند | تایپ شدن همه‌ی ستون‌های enum در هر ۱۰ entity + پارامترهای DAO. نتیجه: ۹ از ۱۰ جدول بایت‌به‌بایت یکسان ماند (فقط نوع Kotlin عوض شد، ستون همچنان TEXT). نقض §6.7/§10.16 برطرف شد |
+
+### باگ‌های مهم
+
+| # | باگ | رفع |
+|---|---|---|
+| ۷ | `provideAppScope()` بدون `@Singleton` → هر تزریق یک `CoroutineScope` جدید با `SupervisorJob` می‌ساخت که هیچ‌وقت cancel نمی‌شد (نشتی) | افزودن `@Singleton` |
+| ۸ | یک بایت خراب در DataStore کل UI را از کار می‌انداخت: `ThemeMode.valueOf()` داخل `Flow.map` استثنا می‌داد و Flow برای همیشه error می‌شد | `enumValueOrDefault` + تست |
+| ۹ | ایندکس تکراری روی `exercise_daily_stats` دقیقاً روی همان دو ستونِ کلید اصلی مرکب (SQLite خودش autoindex می‌سازد) → هزینه‌ی نوشتن دو برابر روی داغ‌ترین جدول Cache | حذف ایندکس؛ تنها تغییر عمدی Schema |
+| ۱۰ | `InputValidator` برای مقدار **کمتر از حد** پیام `TOO_LARGE` می‌داد (`reps=0`، `load=-0.5`، `bodyWeight=19`، …) و **تست‌های موجود همان رفتار غلط را assert می‌کردند** | تفکیک `TOO_SMALL`/`TOO_LARGE` برای هر کران؛ ثابت‌های کران عمومی و مطابق جدول §15 تست شدند؛ تست‌ها اکنون هر دو سمت هر کران را می‌سنجند |
+| ۱۱ | **`NaN` به‌عنوان وزن بدن پذیرفته و ذخیره می‌شد** — همه‌ی مقایسه‌های ترتیبی با NaN مقدار `false` می‌دهند | `isNaN() → INVALID_FORMAT`؛ بی‌نهایت‌ها درست به کران‌ها می‌افتند |
+| ۱۲ | Auto Backup **همه‌ی تنظیمات** را از دست می‌داد: DataStore در `files/datastore/` است نه `shared_prefs/`؛ ضمناً `domain="rootdir"` اصلاً مقدار معتبری نیست (معتبر: root/file/database/sharedpref/external/device_*) | دامنه‌های معتبر + `include domain="file" path="datastore/"` در هر دو فایل قواعد |
+| ۱۳ | `upsertExercises`/`upsertMuscles` با وجود نام «upsert» از `IGNORE` استفاده می‌کردند → هرگز به‌روز نمی‌کردند و نسخه‌بندی Seed (§9.3) شکسته بود | `REPLACE` + `upsertSeedBatch` تراکنشی + `getInstalledSeedVersion()` |
+| ۱۴ | `isInUse()` با قرارداد مستندش نمی‌خواند: KDoc می‌گفت «Workoutهای **COMPLETED**» ولی کوئری هیچ Join یا فیلتر وضعیت نداشت | حفظ بررسی گسترده (به‌عنوان قفل حذف فیزیکی، چون FK از نوع RESTRICT است) + افزودن `isReferencedByCompletedWorkout()` برای متن UI (§11.3) |
+| ۱۵ | `getSetsForExercise` **Draft و WARMUP را وارد آمار می‌کرد** — بدون `status='COMPLETED'`، بدون `is_completed=1`، بدون `set_type != 'WARMUP'` (نقض صریح مقدمه‌ی §7) | تفکیک `getCountedSetsForExercise` (آمار/PR) از `getAllSetsForExercise` (نمایش جزئیات) |
+| ۱۶ | `getExerciseIdsTouchedByWorkout` از طریق `sets` Join می‌شد → اگر آخرین Set یک Exercise حذف می‌شد، آن Exercise از دامنه‌ی ابطال بیرون می‌افتاد و ردیف کهنه‌ی Cache **برای همیشه** باقی می‌ماند (دقیقاً سناریوی §11.4) | خواندن از `activities` |
+| ۱۷ | `searchExercises`: جای `COLLATE NOCASE` غلط بود (به الگو می‌چسبد و بی‌اثر است)؛ `%` و `_` ورودی کاربر به wildcard تبدیل می‌شد؛ Exerciseهای آرشیوشده در جست‌وجو می‌آمدند ولی در بقیه‌ی Pickerها نه | `(search_text COLLATE NOCASE) LIKE :q ESCAPE '\'` + هلپر `escapeLike()` + `is_archived = 0` + افزودن `getActiveExercises()` |
+| ۱۸ | `getLastSessionSets` به‌جای «آخرین Session» **کل تاریخچه** را برمی‌گرداند (Pre-fill §14 اشتباه پر می‌شد) | ساب‌کوئری همبسته برای محدود کردن به یک Workout |
+| ۱۹ | **daemon گریدل OOM می‌شد**: `-Xmx1024m` همراه با `kotlin.compiler.execution.strategy=in-process` (کامپایلر کاتلین داخل همان heap) | بازتولید شد: crash در `:app:mergeExtDexDebug` با `hs_err_pid*.log` و پیام «insufficient memory for the Java Runtime Environment». رفع: heap 2048m + metaspace 512m + کامپایلر out-of-process + `HeapDumpOnOutOfMemoryError`؛ `.gitignore` هم `hs_err_pid*.log` و `*.hprof` گرفت |
+
+### باگ‌های متوسط
+
+| # | باگ | رفع |
+|---|---|---|
+| ۲۰ | `toJalali()` حدود **۴۸٫۱ میکروثانیه** طول می‌کشید — تا ۱۱۰ بار `LocalDate.parse()` در هر فراخوانی | جدول epoch-day از پیش محاسبه‌شده + جست‌وجوی دودویی → **۰٫۱۳۹ میکروثانیه (۳۴۶ برابر سریع‌تر)**؛ یک صفحه‌ی تقویم ۶ هفته‌ای از ۲٫۰۲ms به ۰٫۰۰۶ms رسید. تست regression عملکرد اضافه شد (§17) |
+| ۲۱ | `BEST_E1RM` برای حرکات Bodyweight ردیف PR با مقدار **صفر** می‌ساخت که هرگز شکسته نمی‌شد (چون تساوی رکورد جدید نیست) و Cache را آلوده می‌کرد | افزودن شرط `loadTypeApplies` هم‌راستا با §7.3 |
+| ۲۲ | `BEST_SET_VOLUME` ستون‌های DURATION را مستثنا نمی‌کرد | افزودن گارد |
+| ۲۳ | `GoalCalculator.progress` برای هدف با span صفر همیشه `1.0` می‌داد، حتی وقتی `isAchieved` می‌گفت `false` → نوار پیشرفت پر ولی Badge نرسیده | واگذاری به `isAchieved`؛ همچنین `current` غیرمتناهی دیگر `NaN` بیرون نمی‌دهد (`coerceIn` مقدار NaN را عبور می‌دهد) |
+| ۲۴ | `periodWindow` می‌توانست بازه‌ی **وارونه** برگرداند (`end < start`) وقتی deadline گذشته بود → هر کوئری `BETWEEN` بی‌صدا هیچ چیز برنمی‌گرداند | `coerceAtLeast(start)` |
+| ۲۵ | تنظیمات به‌صورت رشته‌ی آزاد (`"AUTO"`/`"JALALI"`) بین Repository، ViewModel و Screen دست‌به‌دست می‌شد — نقض §6.7؛ ضمناً `weekStart` که `GoalCalculator` و `WeeklySummaryCalculator` لازم داشتند **هیچ تأمین‌کننده‌ای نداشت** (کد مرده) | enumهای `CalendarSystem`/`DigitSystem`/`AppLanguage` + `ResolvedSettings` که `AUTO` را بر پایه‌ی زبان حل می‌کند و `weekStart` را از §13 مشتق می‌کند |
+| ۲۶ | `AppCompatDelegate.setApplicationLocales` از dispatcher نامعلوم صدا زده می‌شد در حالی که وضعیت Activity را تغییر می‌دهد | `withContext(Dispatchers.Main.immediate)` |
+| ۲۷ | `SystemClockImpl` سازنده‌ی `@Inject` نداشت ولی `BindsModule.bindClock` به آن نیاز داشت — Dagger binding را **تنها در صورت درخواست** اعتبارسنجی می‌کند، پس «اتفاقی» کامپایل می‌شد و در فاز ۱ با اولین UseCase می‌ترکید | افزودن `@Inject constructor()`؛ حذف پارامتر گمراه‌کننده‌ی `now(zone)` (مقدار `Instant` ذاتاً مستقل از zone است)؛ افزودن `zoneId()` برای `workouts.timezone_id` |
+| ۲۸ | `fallbackToDestructiveMigrationOnDowngrade()` با §12 («fallbackToDestructiveMigration ممنوع») در تضاد بود؛ در اپ local-first یعنی پاک شدن بی‌صدای داده | حذف شد |
+| ۲۹ | flash سرد در حالت روشن تیره بود: تم والد `android:Theme.Material` (فقط تیره) با `windowBackground` ثابت `#0F1115` | `Theme.AppCompat.DayNight.NoActionBar` + `values-night/` |
+| ۳۰ | نقش‌های رنگی M3 تعریف نشده بودند: `NavigationBar` از `surfaceContainer`، `Card`/`FilterChip` از `surfaceContainerLow`/`secondaryContainer` و `TopAppBar` از `surface` استفاده می‌کنند و همه به پالت خنثی پیش‌فرض می‌افتادند | تعریف کامل نردبان surface-container + نقش‌های container/outline/inverse در هر دو پالت |
+| ۳۱ | KDoc تم به `[MetricTypography]` ارجاع می‌داد که **وجود نداشت** | اصلاح و مستند کردن شیوه‌ی واقعی (style در محل فراخوانی) |
+| ۳۲ | `app_name` ترجمه شده بود (`وریور`) در حالی که §13 صریحاً می‌گوید «نام اپ در هر دو زبان یکسان است و ترجمه نمی‌شود» | حذف از `values-fa` + `translatable="false"` روی `app_name` و دو endonym زبان |
+| ۳۳ | پلاگین serialization فقط در `:app` resolve می‌شد و یک کپی دوم از classpath پلاگین Kotlin به buildscript تزریق می‌کرد | `apply false` در `build.gradle.kts` ریشه |
+| ۳۴ | `enableEdgeToEdge()` **پیش از** `super.onCreate()` صدا زده می‌شد (پنجره هنوز attach نشده) | جابه‌جایی ترتیب |
+| ۳۵ | ردیف چیپ‌های تنظیمات scroll نداشت → با برچسب‌های انگلیسی یا Font Scaling بزرگ (§17) بریده می‌شد | `horizontalScroll` + `Arrangement.spacedBy` |
+| ۳۶ | `README.md` فقط یک خط بود (`# Warrior`) | نگارش کامل README |
+| ۳۷ | CI هیچ گاردی برای Schema نداشت و Lint هم اجرا نمی‌کرد | افزودن گام «Verify Room schema is committed and up to date» + گام `lintDebug` + artifact گزارش Lint |
+
+### موارد شناخته‌شده‌ی رفع‌نشده (عمدی)
+
+| مورد | دلیل |
+|---|---|
+| فونت **Vazirmatn** بسته‌بندی نشده (§13) | نیاز به افزودن باینری فونت با بررسی لایسنس دارد؛ در `WarriorTheme` به‌صورت TODO مستند شد |
+| انتزاع `CalendarSystem` و `UnitFormatter` در لایه‌ی نمایش (§13) | در فاز ۰ هنوز صفحه‌ای تاریخ/عدد رندر نمی‌کند؛ `ResolvedSettings.useJalali`/`usePersianDigits` نقطه‌ی تصمیم را فراهم می‌کنند |
+| استفاده نکردن از `android.icu.util.PersianCalendar` (§5 و §13) | **انحراف عمدی و بهتر**: تقویم ICU وابسته به OEM/Locale است، ولی موتور纯 Kotlin روی همه‌ی دستگاه‌ها یکسان است. پیشنهاد: اصلاح §5/§13 سند |
+| وزن `1` برای Round با مدت صفر/نامعلوم در `IntensityCalculator` | انحراف از میانگین وزنی خالص §7.2 (اختلاط عدد بی‌بعد با ثانیه)؛ رفتار مستند و تست‌شده است و تغییرش تصمیم محصولی است |
+| پارامتر بلااستفاده‌ی `durationSec` در `VolumeCalculator.setVolume` | برای تقارن محل فراخوانی نگه داشته شد؛ فقط warning کامپایلر |
+| `targetSdk 34` / AGP 8.5.2 / Compose BOM 2024.06 | یک نسل عقب‌تر از زمان بازبینی؛ به‌روزرسانی، ریسک مستقل خودش را دارد و بهتر است در فاز ۶ انجام شود |
+
+### آزمون‌ها
+
+- **۳۳ → ۷۵ تست** (۴۲ تست جدید)، همه سبز.
+- `JalaliTest` (جدید، ۱۸ تست): Nowruzهای منتشرشده، سال‌های کبیسه‌ی AP 1330..1459 از الگوریتم مرجع، مرزهای دقیق جدول، پویش ۱۸۸۰–۲۱۳۰ برای «هرگز ماه/روز ناممکن نده»، رفت‌وبرگشت Gregorian↔Jalali روی ۷۳٬۴۱۴ روز، رفت‌وبرگشت همه‌ی تاریخ‌های معتبر AP 1340..1450، مستقل بودن `format()` از ۹ زبان، نام روزها و ماه‌ها، طول ماه‌ها، و تست regression عملکرد.
+- `EnumsTest` (جدید، ۸ تست): پارس امن، `fromTag`، شروع هفته، حل `AUTO`، RTL، و **تست پایداری `name` همه‌ی enumها** (چون §10.16 ذخیره بر پایه‌ی `name` است، تغییر نام = migration).
+- `InputValidatorTest` بازنویسی: هر کران از **هر دو سمت**، NaN/بی‌نهایت، و تطابق ثابت‌ها با جدول §15.
+- `GoalCalculatorTest` و `PrCalculatorTest` گسترش یافتند.
+
+### شواهد Build/Test
+
+- `kotlinc + JUnit` روی کل `domain`/`core` → `OK (75 tests)`
+- type-check هر ۵۱ فایل main با classpath کامل Android → `0 frontend errors`
+- `./gradlew :app:kspDebugKotlin` → سبز؛ `docs/schemas/…/1.json` داخل ریپو تولید شد
+- diff Schema: تنها `exercise_daily_stats` تغییر کرد (حذف ایندکس تکراری)؛ `identityHash` از `06a8f098…` به `ec1650f0…` تغییر کرد که برای نسخه‌ی ۱ بدون کاربر بی‌خطر است
