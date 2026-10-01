@@ -15,7 +15,7 @@
 
 | فاز | عنوان | خروجی قابل تحویل | وضعیت |
 |---|---|---|---|
-| ۰ | پایه | پروژه Gradle KTS + Compose/M3 + Hilt + Room Schema کامل (۱۰ جدول) + Theme دوتیره + Localization FA/RTL/شمسی + CI Actions (build+test+APK artifact) + تست‌های پایه | ✅ تکمیل + بازبینی و رفع ۴۳ باگ (۸۰ تست، CI سبز) |
+| ۰ | پایه | پروژه Gradle KTS + Compose/M3 + Hilt + Room Schema کامل (۱۰ جدول) + Theme دوتیره + Localization FA/RTL/شمسی + CI Actions (build+test+APK artifact) + تست‌های پایه | ✅ تکمیل + بازبینی و رفع ۴۳ باگ (۸۵ تست، CI سبز) |
 | ۱ | هسته‌ی ثبت | Workout Draft (ذخیره مرحله‌ای)، ثبت Strength، Fast Input، TimerEngine + Foreground Service | ⬜ |
 | ۲ | Boxing | Activityهای Boxing، Round/Rest Timer، ثبت دستی Rounds | ⬜ |
 | ۳ | مرور | History (List/Calendar شمسی)، صفحه جزئیات، ویرایش، حذف با Undo | ⬜ |
@@ -150,21 +150,22 @@ _(با تکمیل هر فاز، یک بخش «گزارش» شامل تغییرا
 
 ### آزمون‌ها
 
-- **۳۳ → ۸۰ تست** (۴۷ تست جدید)، همه سبز.
+- **۳۳ → ۸۵ تست** (۵۲ تست جدید)، همه سبز.
 - `JalaliTest` (جدید، ۱۸ تست): Nowruzهای منتشرشده، سال‌های کبیسه‌ی AP 1330..1459 از الگوریتم مرجع، مرزهای دقیق جدول، پویش ۱۸۸۰–۲۱۳۰ برای «هرگز ماه/روز ناممکن نده»، رفت‌وبرگشت Gregorian↔Jalali روی ۷۳٬۴۱۴ روز، رفت‌وبرگشت همه‌ی تاریخ‌های معتبر AP 1340..1450، مستقل بودن `format()` از ۹ زبان، نام روزها و ماه‌ها، طول ماه‌ها، و تست regression عملکرد.
 - `EnumsTest` (جدید، ۸ تست): پارس امن، `fromTag`، شروع هفته، حل `AUTO`، RTL، و **تست پایداری `name` همه‌ی enumها** (چون §10.16 ذخیره بر پایه‌ی `name` است، تغییر نام = migration).
+- `ExerciseDaoQueryTest` (جدید، ۵ تست): الگوی LIKE برای جست‌وجو — escape شدن `%`/`_`/`\`، رفت‌وبرگشت با unescape برای ورودی‌های بیمارگونه، متن فارسی بدون دستکاری، و اینکه U+066F (درصد عربی) با `%` اشتباه گرفته نشود.
 - `ClockTest` (جدید، ۵ تست): edge case الزامی §16 یعنی «جابه‌جایی Timezone» — یک instant واحد در UTC/تهران/نیویورک/Kiritimati، پویش ساعت‌به‌ساعت یک روز کامل در چهار zone، سناریوی ثبت تمرین دقیقاً قبل از نیمه‌شب، و رفت‌وبرگشت `local_date` با لایه‌ی نمایش شمسی. همراه با `FixedClock` در سورس تست (تا در APK release نرود).
 - `InputValidatorTest` بازنویسی: هر کران از **هر دو سمت**، NaN/بی‌نهایت، و تطابق ثابت‌ها با جدول §15.
 - `GoalCalculatorTest` و `PrCalculatorTest` گسترش یافتند.
 
 ### شواهد Build/Test
 
-- `kotlinc + JUnit` روی کل `domain`/`core` → `OK (80 tests)`
+- `kotlinc + JUnit` روی کل `domain`/`core`/`data` → `OK (85 tests)`
 - type-check هر ۵۱ فایل main با classpath کامل Android → `0 frontend errors`
 - `./gradlew :app:kspDebugKotlin` → سبز؛ `docs/schemas/…/1.json` داخل ریپو تولید شد
 - diff Schema: تنها `exercise_daily_stats` تغییر کرد (حذف ایندکس تکراری)؛ `identityHash` از `06a8f098…` به `ec1650f0…` تغییر کرد که برای نسخه‌ی ۱ بدون کاربر بی‌خطر است
 - اثبات رفع باگ ۶: ارجاع به `DatabaseConverters` در کد تولیدشده‌ی Room از **۰ → ۱۸ مورد** در ۶ فایل `*_Impl.java` رسید
-- GitHub Actions Run #3 روی `d221ec7`: **هر ۱۶ گام سبز** (Unit tests · Android Lint · assembleDebug · گارد Schema · سه artifact). تأیید از خودِ artifact تست: **۷۵ تست، ۰ خطا، ۰ skip** (پس از افزودن `ClockTest` می‌شود ۸۰)
+- GitHub Actions Run #3 روی `d221ec7`: **هر ۱۶ گام سبز** (Unit tests · Android Lint · assembleDebug · گارد Schema · سه artifact). تأیید از خودِ artifact تست: **۷۵ تست، ۰ خطا، ۰ skip** (پس از افزودن `ClockTest` و `ExerciseDaoQueryTest` می‌شود ۸۵)
 - لینک Actions: https://github.com/KhodeSushianm/Warrior/actions/runs/36873224311
 
 ### نتیجه‌ی Lint پس از رفع‌ها

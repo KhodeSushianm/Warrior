@@ -61,9 +61,9 @@ interface ExerciseDao {
     /**
      * Substring search over the pre-computed `search_text` column.
      *
-     * - The caller must pre-escape LIKE metacharacters; [escapeLike] does it and pairs with
-     *   `ESCAPE '\'` so a query containing `%` or `_` is treated literally instead of as a
-     *   wildcard.
+     * - The parameter must be built by [containsQuery], which escapes LIKE metacharacters to
+     *   pair with `ESCAPE '\'` (so a query containing `%` or `_` matches literally instead of
+     *   acting as a wildcard) and adds the surrounding `%`.
      * - `COLLATE NOCASE` is applied to the *column* (its only effective position), not to the
      *   pattern.
      * - Archived rows are excluded to stay consistent with the other Picker queries.
@@ -148,8 +148,11 @@ interface ExerciseDao {
     suspend fun getInstalledSeedVersion(): Int?
 
     companion object {
-        /** Escape SQLite LIKE metacharacters for use with `ESCAPE '\'`. */
-        fun escapeLike(raw: String): String = buildString(raw.length + 8) {
+        /**
+         * Build the argument for [searchExercises]: a `%`-wrapped substring pattern with SQLite
+         * LIKE metacharacters escaped, to be used with `ESCAPE '\'`.
+         */
+        fun containsQuery(raw: String): String = buildString(raw.length + 8) {
             append('%')
             for (ch in raw) {
                 if (ch == '\\' || ch == '%' || ch == '_') append('\\')

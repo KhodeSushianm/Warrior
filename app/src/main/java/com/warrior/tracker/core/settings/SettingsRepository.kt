@@ -18,7 +18,6 @@ import com.warrior.tracker.core.common.resolvesToPersian
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
@@ -88,22 +87,28 @@ class SettingsRepository @Inject constructor(
     val weekStartOverride: Flow<DayOfWeek?> = dataStore.data
         .map { prefs -> prefs[WEEK_START_KEY]?.let { name -> DayOfWeek.values().firstOrNull { it.name == name } } }
 
-    /** Settings with every `AUTO` resolved — the value UI/calculators should read. */
-    val resolved: Flow<ResolvedSettings> = combine(
-        themeMode,
-        languageOverride,
-        calendarSystem,
-        digitSystem,
-        weekStartOverride,
-    ) { theme, override, calendar, digits, weekStart ->
+    /**
+     * Settings with every `AUTO` resolved — the value UI and calculators should read.
+     *
+     * Built from a single `dataStore.data` subscription rather than combining the five derived
+     * flows above, so one preference change costs one read instead of five collectors waking up.
+     *
+     * `languageFor` also consults `Locale.getDefault()` when no override is stored. That input is
+     * not a Flow, but a system-locale change recreates the Activity (and therefore the ViewModels
+     * collecting this), so the value is re-derived at exactly the moment it can have changed.
+     */
+    val resolved: Flow<ResolvedSettings> = dataStore.data.map { prefs ->
+        val override = prefs[LANGUAGE_KEY]?.takeIf { it.isNotEmpty() }
         val language = languageFor(override)
         ResolvedSettings(
-            themeMode = theme,
+            themeMode = enumValueOrDefault(prefs[THEME_KEY], ThemeMode.SYSTEM),
             language = language,
             languageIsOverridden = override != null,
-            calendarSystem = calendar,
-            digitSystem = digits,
-            weekStart = weekStart ?: language.derivedWeekStart(),
+            calendarSystem = enumValueOrDefault(prefs[CALENDAR_KEY], CalendarSystem.AUTO),
+            digitSystem = enumValueOrDefault(prefs[DIGITS_KEY], DigitSystem.AUTO),
+            weekStart = prefs[WEEK_START_KEY]
+                ?.let { name -> DayOfWeek.values().firstOrNull { it.name == name } }
+                ?: language.derivedWeekStart(),
         )
     }
 
