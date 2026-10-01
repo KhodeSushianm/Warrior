@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">وریور</string>
 
     <!-- Navigation -->
     <string name="nav_home">خانه</string>
@@ -22,8 +21,6 @@
     <string name="settings_theme_dark">تیره</string>
     <string name="settings_language">زبان</string>
     <string name="settings_language_system">پیش‌فرض سیستم</string>
-    <string name="settings_language_en">English</string>
-    <string name="settings_language_fa">فارسی</string>
     <string name="settings_calendar">تقویم</string>
     <string name="settings_auto">خودکار</string>
     <string name="settings_jalali">شمسی</string>

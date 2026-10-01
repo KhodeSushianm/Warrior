@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="warrior_background">#0F1115</color>
+    <!-- Light-mode cold-start background (matches WarriorTheme's SurfaceLight). -->
+    <color name="warrior_background">#F7F8FA</color>
     <color name="ic_launcher_background">#0F1115</color>
 </resources>

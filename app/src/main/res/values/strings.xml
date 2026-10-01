@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Warrior</string>
+    <!-- sec.13: the app name is identical in both languages and is never translated. -->
+    <string name="app_name" translatable="false">Warrior</string>
 
     <!-- Navigation -->
     <string name="nav_home">Home</string>
@@ -22,8 +23,9 @@
     <string name="settings_theme_dark">Dark</string>
     <string name="settings_language">Language</string>
     <string name="settings_language_system">System default</string>
-    <string name="settings_language_en">English</string>
-    <string name="settings_language_fa">فارسی</string>
+    <!-- Endonyms: language names are shown in their own language, never translated. -->
+    <string name="settings_language_en" translatable="false">English</string>
+    <string name="settings_language_fa" translatable="false">فارسی</string>
     <string name="settings_calendar">Calendar</string>
     <string name="settings_auto">Auto</string>
     <string name="settings_jalali">Jalali</string>

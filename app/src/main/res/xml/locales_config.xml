@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Per-app languages advertised to the platform (sec.13). Required on API 33+ so the app appears in
+  Settings > Apps > Language; on API 32 and below AppCompat reads the same list.
+  Must stay in sync with AppLanguage and with the res/values-* source sets.
+-->
+<locale-config xmlns:android="http://schemas.android.com/apk/res/android">
+    <locale android:name="en" />
+    <locale android:name="fa" />
+</locale-config>

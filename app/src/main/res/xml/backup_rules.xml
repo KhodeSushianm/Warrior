@@ -1,5 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  Auto Backup rules for Android 11 and lower (android:fullBackupContent).
+  Must mirror data_extraction_rules.xml, which only applies from Android 12 up.
+-->
 <full-backup-content>
+    <!-- Room database. -->
     <include domain="database" path="." />
+    <!-- DataStore Preferences live in files/datastore/, not in shared_prefs/. -->
+    <include domain="file" path="datastore/" />
+    <!-- AppCompat per-app-language storage. -->
     <include domain="sharedpref" path="." />
 </full-backup-content>

@@ -4,7 +4,6 @@ import android.content.Context
 import androidx.room.Room
 import com.warrior.tracker.core.time.Clock
 import com.warrior.tracker.core.time.SystemClockImpl
-import com.warrior.tracker.data.local.converter.DatabaseConverters
 import com.warrior.tracker.data.local.database.AppDatabase
 import dagger.Binds
 import dagger.Module
@@ -28,12 +27,18 @@ annotation class IoDispatcher
 @InstallIn(SingletonComponent::class)
 object AppModule {
 
+    /**
+     * sec.12: schemas live in Git and every version change gets an explicit Migration;
+     * `fallbackToDestructiveMigration` is forbidden. No destructive downgrade fallback either —
+     * for a local-first app whose data has no server copy, silently wiping the database is the
+     * exact failure mode sec.12 exists to prevent.
+     */
     @Provides
     @Singleton
     fun provideDatabase(@ApplicationContext context: Context): AppDatabase =
         Room.databaseBuilder(context, AppDatabase::class.java, AppDatabase.NAME)
-            .addTypeConverter(DatabaseConverters()) // same instance used by schema (Room 2.6 construction)
-            .fallbackToDestructiveMigrationOnDowngrade()
+            // Enum <-> TEXT converters are declared on the database via @TypeConverters; Room
+            // instantiates them itself, so no addTypeConverter() call is needed.
             .build()
 
     @Provides fun provideWorkoutDao(db: AppDatabase) = db.workoutDao()
@@ -48,8 +53,14 @@ object AppModule {
     @Provides
     @Singleton
     @IoDispatcher
-    fun provideIoDispatcher() = Dispatchers.IO
+    fun provideIoDispatcher(): CoroutineDispatcher = Dispatchers.IO
 
+    /**
+     * Application-lifetime scope for work that must outlive a ViewModel (stats rebuild after a
+     * delete, seeding). MUST be a singleton: an unscoped @Provides handed every injection point a
+     * fresh CoroutineScope with its own SupervisorJob that nothing ever cancelled, leaking a job
+     * and its dispatcher slot per injection.
+     */
     @Provides
     @Singleton
     fun provideAppScope(@IoDispatcher io: CoroutineDispatcher): CoroutineScope =

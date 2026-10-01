@@ -1,8 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  Pre-Compose window theme. Compose/Material 3 owns all in-app theming (sec.14.2); this exists
+  only to avoid a wrong-coloured flash at cold start and to satisfy AppCompatActivity, which
+  sec.13's per-app-language support requires on API 32 and below.
+
+  DayNight (not android:Theme.Material, which is dark-only) so the splash background matches the
+  user's theme mode; values-night overrides the colour.
+-->
 <resources>
-    <!-- Compose owns all theming (Material 3, dark-first). This is only the
-         pre-Compose window theme to avoid a white flash at cold start. -->
-    <style name="Theme.Warrior" parent="android:Theme.Material.NoActionBar">
+    <style name="Theme.Warrior" parent="Theme.AppCompat.DayNight.NoActionBar">
         <item name="android:windowBackground">@color/warrior_background</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
     </style>
 </resources>
