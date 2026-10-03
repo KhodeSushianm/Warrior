@@ -13,7 +13,8 @@ through a manual export that you initiate.
 | Phase | Scope | State |
 |---|---|---|
 | **0** | Project foundation: Gradle KTS, Compose/M3, Hilt, Room (10 tables), dark/light theme, FA/EN + RTL + Jalali, CI, unit tests | ✅ complete (audited & fixed — see below) |
-| 1 | Logging core: workout draft, strength sets, fast input, timer + foreground service | ⬜ |
+| **1A** | Bodyweight logging: resumable draft, 19 built-in exercises, reps/timed sets, recent-session tracking | ✅ complete in v0.2.0 |
+| 1B | Weighted strength input, timer + foreground service | ⬜ |
 | 2 | Boxing activities, round/rest timer, manual rounds | ⬜ |
 | 3 | History (list + Jalali calendar), detail, edit, delete with undo | ⬜ |
 | 4 | Progress: volume / PR / e1RM, stats cache, charts, goals, body weight | ⬜ |
@@ -23,6 +24,13 @@ through a manual export that you initiate.
 See [`PHASES.md`](PHASES.md) for the phase plan and delivery reports, and
 [`ARCHITECTURE.md`](ARCHITECTURE.md) for the full design document (18 sections — domain model,
 schema, metric definitions, validation rules, testing strategy).
+
+### Bodyweight logger (v0.2.0)
+
+The Workouts tab now provides a complete offline bodyweight flow: start or resume the single saved
+workout draft, choose from 19 bilingual push/pull/legs/core exercises, log repetition or timed-hold
+sets, remove mistakes, finish the session, and review recent totals. Every confirmed set is written
+to Room immediately; finishing refreshes affected daily-stat cache rows from the raw sets.
 
 ---
 
@@ -46,7 +54,7 @@ schema, metric definitions, validation rules, testing strategy).
 ## Repository layout
 
 ```
-app/src/main/java/com/warrior/tracker/
+android-app/src/main/java/com/warrior/tracker/
 ├── MainActivity.kt              Single-Activity host (AppCompatActivity — required for per-app language)
 ├── MainViewModel.kt             App-wide UI state (theme mode)
 ├── core/
@@ -142,9 +150,9 @@ Requirements: JDK 17 and the Android SDK with platform 34 / build-tools 34.0.0.
 ```bash
 echo "sdk.dir=/path/to/android-sdk" > local.properties   # or set ANDROID_HOME
 
-./gradlew :app:testDebugUnitTest     # unit tests
-./gradlew :app:lintDebug             # lint report -> app/build/reports/
-./gradlew :app:assembleDebug         # APK -> app/build/outputs/apk/debug/
+./gradlew :android-app:testDebugUnitTest     # unit tests
+./gradlew :android-app:lintDebug             # lint report -> android-app/build/reports/
+./gradlew :android-app:assembleDebug         # APK -> android-app/build/outputs/apk/debug/
 ```
 
 CI (`.github/workflows/build.yml`) runs those tasks on every push and PR, then verifies that the

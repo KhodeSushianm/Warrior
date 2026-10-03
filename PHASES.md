@@ -16,7 +16,7 @@
 | فاز | عنوان | خروجی قابل تحویل | وضعیت |
 |---|---|---|---|
 | ۰ | پایه | پروژه Gradle KTS + Compose/M3 + Hilt + Room Schema کامل (۱۰ جدول) + Theme دوتیره + Localization FA/RTL/شمسی + CI Actions (build+test+APK artifact) + تست‌های پایه | ✅ تکمیل + بازبینی و رفع ۴۳ باگ (۸۵ تست، CI سبز) |
-| ۱ | هسته‌ی ثبت | Workout Draft (ذخیره مرحله‌ای)، ثبت Strength، Fast Input، TimerEngine + Foreground Service | ⬜ |
+| ۱ | هسته‌ی ثبت | Workout Draft، ثبت Strength و Fast Input؛ بخش وزن بدن در v0.2.0 تکمیل شده، Timer و وزنه خارجی باقی است | 🟨 در حال اجرا |
 | ۲ | Boxing | Activityهای Boxing، Round/Rest Timer، ثبت دستی Rounds | ⬜ |
 | ۳ | مرور | History (List/Calendar شمسی)، صفحه جزئیات، ویرایش، حذف با Undo | ⬜ |
 | ۴ | Progress | Volume/PR/e1RM، کش آماری (exercise_daily_stats/pr_events)، نمودارها، Goals، Body Weight | ⬜ |
@@ -55,6 +55,21 @@ _(با تکمیل هر فاز، یک بخش «گزارش» شامل تغییرا
 **لینک Actions:** https://github.com/KhodeSushianm/Warrior/actions/runs/36850464805 (Workflow ID: 36850464805)
 
 **Artifact APK:** warrior-debug-apk (17.3 MB) قابل دانلود از صفحه Summary این Run
+
+---
+
+## گزارش تحویل ثبت تمرین وزن بدن — نسخه ۰.۲.۰ ✅
+
+- مسیر کامل ساخت یا ادامه‌ی Workout Draft و ذخیره فوری هر Set در Room
+- کتابخانه داخلی ۱۹ حرکت دوزبانه برای Push، Pull، Legs و Core
+- پشتیبانی از حرکت‌های تکراری و زمان‌محور با اعتبارسنجی مرکزی
+- افزودن/حذف حرکت، ثبت/حذف ست، شماره‌گذاری مجدد و پایان Workout
+- نمایش تاریخ و ارقام بر اساس تنظیمات فارسی/انگلیسی و شمسی/میلادی
+- خلاصه تمرین‌های تکمیل‌شده: تعداد حرکت، ست، تکرار، زمان Hold و مدت Session
+- بازسازی ردیف‌های `exercise_daily_stats` در Transaction پایان تمرین
+- نسخه اپ: `versionCode=2` و `versionName=0.2.0`
+
+موارد باقی‌مانده از فاز ۱: ثبت وزنه خارجی، TimerEngine و Foreground Service.
 
 ---
 

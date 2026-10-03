@@ -58,7 +58,7 @@ jobs:
           SCHEMA_DIR="docs/schemas/com.warrior.tracker.data.local.database.AppDatabase"
           test -f "$SCHEMA_DIR/1.json" || {
             echo "::error::Room schema JSON not found at $SCHEMA_DIR/1.json"
-            echo "Check the room.schemaLocation KSP arg in app/build.gradle.kts — it must resolve inside the repository."
+            echo "Check the room.schemaLocation KSP arg in android-app/build.gradle.kts — it must resolve inside the repository."
             exit 1
           }
           if ! git diff --quiet -- docs/schemas; then
@@ -73,7 +73,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: unit-test-results
-          path: app/build/test-results/**/*.xml
+          path: android-app/build/test-results/**/*.xml
           retention-days: 14
           if-no-files-found: warn
 
@@ -82,7 +82,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: lint-report
-          path: app/build/reports/lint-results-debug.*
+          path: android-app/build/reports/lint-results-debug.*
           retention-days: 14
           if-no-files-found: warn
 
@@ -90,5 +90,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: warrior-debug-apk
-          path: app/build/outputs/apk/debug/*.apk
+          path: android-app/build/outputs/apk/debug/*.apk
           retention-days: 30

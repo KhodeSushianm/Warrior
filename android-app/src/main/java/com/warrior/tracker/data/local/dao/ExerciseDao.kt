@@ -91,7 +91,13 @@ interface ExerciseDao {
     @Query("SELECT * FROM exercises WHERE equipment = :equipment AND is_archived = 0")
     fun getExercisesByEquipment(equipment: Equipment): Flow<List<ExerciseEntity>>
 
-    @Query("SELECT * FROM exercises WHERE load_type = 'BODYWEIGHT' AND is_archived = 0")
+    @Query(
+        """
+        SELECT * FROM exercises
+        WHERE load_type = 'BODYWEIGHT' AND is_archived = 0
+        ORDER BY search_text COLLATE NOCASE ASC
+        """
+    )
     fun getBodyweightExercises(): Flow<List<ExerciseEntity>>
 
     @Insert(onConflict = OnConflictStrategy.ABORT)
