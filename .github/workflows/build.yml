@@ -18,6 +18,8 @@ jobs:
     name: Assemble Debug + Unit Tests
     runs-on: ubuntu-latest
     timeout-minutes: 40
+    permissions:
+      contents: write
 
     steps:
       - name: Checkout
@@ -104,3 +106,27 @@ jobs:
           name: warrior-debug-apk
           path: android-app/build/outputs/apk/debug/*.apk
           retention-days: 30
+
+      # The Arena integration cannot download Actions blobs in every sandbox. Publishing from the
+      # runner keeps the verified APK byte-for-byte identical to the artifact built above.
+      - name: Publish v0.2.0 GitHub Release
+        if: github.event_name == 'pull_request' && github.head_ref == 'arena/01a1019a-warrior'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: v0.2.0
+          TARGET_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -euo pipefail
+          APK="$(find android-app/build/outputs/apk/debug -maxdepth 1 -name '*.apk' -print -quit)"
+          test -n "$APK"
+          RELEASE_APK="$RUNNER_TEMP/warrior-v0.2.0-debug.apk"
+          cp "$APK" "$RELEASE_APK"
+          if gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release upload "$RELEASE_TAG" "$RELEASE_APK" --clobber --repo "$GITHUB_REPOSITORY"
+          else
+            gh release create "$RELEASE_TAG" "$RELEASE_APK" \
+              --repo "$GITHUB_REPOSITORY" \
+              --target "$TARGET_SHA" \
+              --title "Warrior v0.2.0 — Bodyweight Tracking" \
+              --notes "Offline bodyweight workout tracking with 19 bilingual exercises, resumable drafts, repetition and timed sets, daily statistics, and recent workout summaries. This is an installable debug-signed APK for Android 8.0 and newer."
+          fi
