@@ -21,4 +21,4 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "Warrior"
-include(":app")
+include(":android-app")

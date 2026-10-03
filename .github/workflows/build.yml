@@ -40,13 +40,13 @@ jobs:
         run: chmod +x ./gradlew
 
       - name: Unit tests
-        run: ./gradlew :app:testDebugUnitTest --stacktrace
+        run: ./gradlew :android-app:testDebugUnitTest --stacktrace
 
       - name: Android Lint
-        run: ./gradlew :app:lintDebug --stacktrace
+        run: ./gradlew :android-app:lintDebug --stacktrace
 
       - name: Assemble debug APK
-        run: ./gradlew :app:assembleDebug --stacktrace
+        run: ./gradlew :android-app:assembleDebug --stacktrace
 
       # Guards the sec.12 requirement that Room schemas are kept in Git. Phase 0 exported them to
       # "$projectDir/../../docs/schemas", i.e. one level ABOVE the repository root, so the JSON was
