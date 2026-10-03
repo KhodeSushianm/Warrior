@@ -17,6 +17,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.redirect(url, 303);
     }
 
+    if (form.get("lang") === "fa") {
+      url.searchParams.set("lang", "fa");
+    }
+
     // Sets are removed by the ON DELETE CASCADE on bodyweight_sets.workout_id.
     await db.delete(bodyweightWorkouts).where(eq(bodyweightWorkouts.id, id));
   } catch (error) {

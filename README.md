@@ -192,6 +192,11 @@ It deliberately mirrors the Android domain instead of inventing a second one:
 - the same tonnage rule: `SUM(external_load_kg × reps)` of **added-load, non-warm-up** sets only —
   pure bodyweight and assisted work contributes 0.
 
+The web UI is bilingual: `/bodyweight?lang=fa` renders a full RTL Persian interface with Jalali
+dates and Persian digits (fa-IR `Intl`, no lookup tables) — the app's Persian-first philosophy
+carried over to the browser. The domain and validation module is covered by vitest
+(`npm test`, mirroring the Android InputValidator/NumberInputParser unit tests).
+
 Data lives in PostgreSQL via Drizzle (`src/db/schema.ts` — workouts owner, sets cascade on
 delete, UUID keys, UTC timestamps, kg only). To run locally: copy `.env.example` to
 `.env.local`, point `DATABASE_URL` at a PostgreSQL database, then

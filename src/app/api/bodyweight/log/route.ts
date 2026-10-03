@@ -16,6 +16,12 @@ export async function POST(request: NextRequest) {
     return NextResponse.redirect(url, 303);
   }
 
+  // Keep the caller in their language after the redirect (?lang=fa renders RTL Persian).
+  const lang = form.get("lang");
+  if (lang === "fa") {
+    url.searchParams.set("lang", "fa");
+  }
+
   const parsed = parseLogForm(form);
   if (!parsed.ok) {
     url.searchParams.set("log_error", parsed.error);

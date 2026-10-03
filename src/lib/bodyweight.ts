@@ -255,28 +255,42 @@ export function setTonnageKg(loadType: LoadType, set: SetLike): number {
   return set.externalLoadKg * set.reps;
 }
 
-export type SetChip = { count: number; label: string };
+export type SetGroup = {
+  count: number;
+  reps: number | null;
+  durationSec: number | null;
+  externalLoadKg: number;
+};
 
-/** Condenses identical consecutive sets ("3 × 12 reps") so fast-input sessions stay readable. */
-export function summarizeSets(
+/**
+ * Groups identical consecutive sets so fast-input sessions stay readable
+ * ("3 × 12 reps" instead of three separate rows). Rendering is left to
+ * `formatSetGroup` in bodyweight-i18n so the label can be localized.
+ */
+export function groupSets(
   sets: { setNumber: number; reps: number | null; durationSec: number | null; externalLoadKg: number }[],
-): SetChip[] {
+): SetGroup[] {
   const sorted = [...sets].sort((a, b) => a.setNumber - b.setNumber);
-  const chips: SetChip[] = [];
+  const groups: SetGroup[] = [];
   for (const set of sorted) {
-    const load = set.externalLoadKg > 0 ? ` · +${formatKg(set.externalLoadKg)} kg` : "";
-    const label =
-      set.reps !== null ? `${set.reps} reps${load}` : `${set.durationSec ?? 0} s${load}`;
-    const last = chips[chips.length - 1];
-    if (last && last.label === label) {
+    const last = groups[groups.length - 1];
+    if (
+      last &&
+      last.reps === set.reps &&
+      last.durationSec === set.durationSec &&
+      last.externalLoadKg === set.externalLoadKg
+    ) {
       last.count += 1;
     } else {
-      chips.push({ count: 1, label });
+      groups.push({
+        count: 1,
+        reps: set.reps,
+        durationSec: set.durationSec,
+        externalLoadKg: set.externalLoadKg,
+      });
     }
   }
-  return chips.map((chip) =>
-    chip.count > 1 ? { count: chip.count, label: `${chip.count} × ${chip.label}` } : chip,
-  );
+  return groups;
 }
 
 export function formatKg(value: number): string {

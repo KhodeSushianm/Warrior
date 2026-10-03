@@ -313,12 +313,20 @@ export default async function HomePage({ searchParams }: HomePageProps) {
                 tonnage).
               </p>
             </div>
-            <Link
-              href="/bodyweight"
-              className="inline-flex w-fit shrink-0 items-center rounded-xl bg-white px-5 py-3 text-sm font-medium text-slate-900 hover:bg-slate-200"
-            >
-              Open bodyweight log
-            </Link>
+            <div className="flex flex-wrap items-center gap-3">
+              <Link
+                href="/bodyweight"
+                className="inline-flex w-fit shrink-0 items-center rounded-xl bg-white px-5 py-3 text-sm font-medium text-slate-900 hover:bg-slate-200"
+              >
+                Open bodyweight log
+              </Link>
+              <Link
+                href="/bodyweight?lang=fa"
+                className="text-sm font-medium text-emerald-300/90 hover:text-emerald-300"
+              >
+                نسخه فارسی
+              </Link>
+            </div>
           </div>
         </section>
 
