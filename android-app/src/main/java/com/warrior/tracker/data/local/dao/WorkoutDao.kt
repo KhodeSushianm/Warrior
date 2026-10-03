@@ -9,8 +9,8 @@ import androidx.room.Transaction
 import androidx.room.Update
 import com.warrior.tracker.core.common.ActivityType
 import com.warrior.tracker.data.local.entity.WorkoutEntity
-import com.warrior.tracker.data.local.model.BodyweightWorkoutSummaryRow
-import com.warrior.tracker.data.local.model.WorkoutWithBodyweightDetails
+import com.warrior.tracker.data.local.model.WorkoutSummaryRow
+import com.warrior.tracker.data.local.model.WorkoutWithDetails
 import kotlinx.coroutines.flow.Flow
 
 /** Main methods per ARCHITECTURE.md sec.10.16. */
@@ -64,9 +64,9 @@ interface WorkoutDao {
     /** Active draft plus its activities, exercises and sets; relation tables also invalidate the Flow. */
     @Transaction
     @Query("SELECT * FROM workouts WHERE status = 'IN_PROGRESS' ORDER BY started_at DESC LIMIT 1")
-    fun observeInProgressWorkoutDetails(): Flow<WorkoutWithBodyweightDetails?>
+    fun observeInProgressWorkoutDetails(): Flow<WorkoutWithDetails?>
 
-    /** Completed sessions containing at least one bodyweight activity, aggregated for the logger history. */
+    /** Completed sessions containing Strength activities, aggregated for the existing Workouts tab. */
     @Query(
         """
         SELECT w.id, w.started_at, w.local_date, w.active_duration_sec,
@@ -76,7 +76,6 @@ interface WorkoutDao {
                COALESCE(SUM(CASE WHEN s.duration_sec IS NOT NULL THEN s.duration_sec ELSE 0 END), 0) AS total_duration_sec
         FROM workouts w
         JOIN activities a ON a.workout_id = w.id AND a.type = 'STRENGTH'
-        JOIN exercises e ON e.id = a.exercise_id AND e.load_type = 'BODYWEIGHT'
         LEFT JOIN sets s ON s.activity_id = a.id AND s.is_completed = 1 AND s.set_type != 'WARMUP'
         WHERE w.status = 'COMPLETED'
         GROUP BY w.id
@@ -84,7 +83,7 @@ interface WorkoutDao {
         LIMIT :limit
         """
     )
-    fun observeRecentBodyweightWorkouts(limit: Int): Flow<List<BodyweightWorkoutSummaryRow>>
+    fun observeRecentStrengthWorkouts(limit: Int): Flow<List<WorkoutSummaryRow>>
 
     @Query(
         """

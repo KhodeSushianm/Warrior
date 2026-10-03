@@ -17,7 +17,7 @@ data class ActivityWithSetsAndExercise(
     val exercise: ExerciseEntity?,
 )
 
-data class WorkoutWithBodyweightDetails(
+data class WorkoutWithDetails(
     @Embedded val workout: WorkoutEntity,
     @Relation(
         entity = ActivityEntity::class,
@@ -28,7 +28,7 @@ data class WorkoutWithBodyweightDetails(
 )
 
 /** Projection returned by the completed-workout summary query. */
-data class BodyweightWorkoutSummaryRow(
+data class WorkoutSummaryRow(
     val id: String,
     @ColumnInfo(name = "started_at") val startedAt: Long,
     @ColumnInfo(name = "local_date") val localDate: String,

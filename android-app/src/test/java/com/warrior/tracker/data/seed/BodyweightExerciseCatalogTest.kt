@@ -12,6 +12,8 @@ class BodyweightExerciseCatalogTest {
     fun `catalog has stable unique keys and bilingual names`() {
         assertEquals(19, BODYWEIGHT_EXERCISES.size)
         assertEquals(BODYWEIGHT_EXERCISES.size, BODYWEIGHT_EXERCISES.map { it.key }.toSet().size)
+        // Keys are persistence identifiers (`builtin:<key>`), not UI copy; never rename them.
+        assertTrue(BODYWEIGHT_EXERCISES.any { it.key == "bodyweight_squat" })
         BODYWEIGHT_EXERCISES.forEach { exercise ->
             assertTrue(exercise.key.matches(Regex("[a-z0-9_]+")))
             assertTrue(exercise.nameEn.isNotBlank())

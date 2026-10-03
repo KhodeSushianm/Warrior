@@ -5,8 +5,8 @@ import androidx.room.Room
 import com.warrior.tracker.core.time.Clock
 import com.warrior.tracker.core.time.SystemClockImpl
 import com.warrior.tracker.data.local.database.AppDatabase
-import com.warrior.tracker.data.repository.DefaultBodyweightWorkoutRepository
-import com.warrior.tracker.domain.repository.BodyweightWorkoutRepository
+import com.warrior.tracker.data.repository.DefaultWorkoutLoggingRepository
+import com.warrior.tracker.domain.repository.WorkoutLoggingRepository
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -78,7 +78,7 @@ abstract class BindsModule {
 
     @Binds
     @Singleton
-    abstract fun bindBodyweightWorkoutRepository(
-        impl: DefaultBodyweightWorkoutRepository,
-    ): BodyweightWorkoutRepository
+    abstract fun bindWorkoutLoggingRepository(
+        impl: DefaultWorkoutLoggingRepository,
+    ): WorkoutLoggingRepository
 }

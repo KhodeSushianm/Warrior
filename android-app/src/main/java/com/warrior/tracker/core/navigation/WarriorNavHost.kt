@@ -19,7 +19,7 @@ import com.warrior.tracker.feature.history.HistoryPlaceholderScreen
 import com.warrior.tracker.feature.home.HomeScreen
 import com.warrior.tracker.feature.progress.ProgressPlaceholderScreen
 import com.warrior.tracker.feature.settings.SettingsScreen
-import com.warrior.tracker.feature.workout.BodyweightWorkoutsScreen
+import com.warrior.tracker.feature.workout.WorkoutsScreen
 
 /**
  * App shell — Bottom Navigation with 4 tabs (sec.3). Settings is a route opened from Home's
@@ -75,7 +75,7 @@ fun WarriorAppRoot() {
                     onStartWorkout = { navController.navigate(Screen.Workouts.route) },
                 )
             }
-            composable(Screen.Workouts.route) { BodyweightWorkoutsScreen() }
+            composable(Screen.Workouts.route) { WorkoutsScreen() }
             composable(Screen.History.route) { HistoryPlaceholderScreen() }
             composable(Screen.Progress.route) { ProgressPlaceholderScreen() }
             composable(Screen.Settings.route) { SettingsScreen(onBack = { navController.popBackStack() }) }

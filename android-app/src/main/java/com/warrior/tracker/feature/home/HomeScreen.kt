@@ -28,7 +28,7 @@ import com.warrior.tracker.R
 
 /**
  * Home tab (sec.3). Real weekly summary tiles arrive in Phase 4;
- * "Start Workout" opens the persisted bodyweight Draft flow delivered in v0.2.
+ * "Start Workout" opens the persisted draft in the existing Workouts flow.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

@@ -53,21 +53,22 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.warrior.tracker.R
+import com.warrior.tracker.core.common.LoadType
 import com.warrior.tracker.core.common.MeasureType
 import com.warrior.tracker.core.time.toJalali
 import com.warrior.tracker.core.time.toPersianDigits
-import com.warrior.tracker.domain.model.BodyweightActivity
-import com.warrior.tracker.domain.model.BodyweightExercise
-import com.warrior.tracker.domain.model.BodyweightWorkoutDraft
-import com.warrior.tracker.domain.model.BodyweightWorkoutSummary
+import com.warrior.tracker.domain.model.StrengthActivity
+import com.warrior.tracker.domain.model.StrengthExercise
+import com.warrior.tracker.domain.model.WorkoutDraft
+import com.warrior.tracker.domain.model.WorkoutSummary
 import java.time.LocalDate
 import java.util.Locale
 
-/** End-to-end bodyweight strength logger: draft, exercises, completed sets and recent history. */
+/** Existing Workouts flow with offline Strength logging and recent history. */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BodyweightWorkoutsScreen(
-    viewModel: BodyweightWorkoutViewModel = hiltViewModel(),
+fun WorkoutsScreen(
+    viewModel: WorkoutLoggingViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -82,7 +83,7 @@ fun BodyweightWorkoutsScreen(
     }
 
     Scaffold(
-        topBar = { TopAppBar(title = { Text(stringResource(R.string.bodyweight_title)) }) },
+        topBar = { TopAppBar(title = { Text(stringResource(R.string.workout_title)) }) },
         snackbarHost = { SnackbarHost(snackbarHostState) },
     ) { innerPadding ->
         LazyColumn(
@@ -94,7 +95,7 @@ fun BodyweightWorkoutsScreen(
         ) {
             item {
                 Text(
-                    text = stringResource(R.string.bodyweight_subtitle),
+                    text = stringResource(R.string.workout_subtitle),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -118,7 +119,7 @@ fun BodyweightWorkoutsScreen(
 
             item {
                 Text(
-                    text = stringResource(R.string.bodyweight_recent),
+                    text = stringResource(R.string.workout_recent),
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.SemiBold,
                     modifier = Modifier.padding(top = 6.dp),
@@ -128,7 +129,7 @@ fun BodyweightWorkoutsScreen(
             if (state.recentWorkouts.isEmpty()) {
                 item {
                     Text(
-                        text = stringResource(R.string.bodyweight_no_history),
+                        text = stringResource(R.string.workout_no_history),
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
@@ -159,7 +160,7 @@ fun BodyweightWorkoutsScreen(
 
 @Composable
 private fun ActiveWorkoutSection(
-    draft: BodyweightWorkoutDraft?,
+    draft: WorkoutDraft?,
     usePersianNames: Boolean,
     useJalali: Boolean,
     usePersianDigits: Boolean,
@@ -189,7 +190,7 @@ private fun ActiveWorkoutSection(
                         CircularProgressIndicator(modifier = Modifier.size(18.dp), strokeWidth = 2.dp)
                         Spacer(Modifier.width(8.dp))
                     }
-                    Text(stringResource(R.string.bodyweight_start))
+                    Text(stringResource(R.string.workout_start))
                 }
             }
         }
@@ -203,20 +204,20 @@ private fun ActiveWorkoutSection(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 Text(
-                    text = stringResource(R.string.bodyweight_active),
+                    text = stringResource(R.string.workout_active),
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
                 )
                 Text(
                     text = stringResource(
-                        R.string.bodyweight_date,
+                        R.string.workout_date,
                         formatDate(draft.localDate, useJalali, usePersianDigits),
                     ),
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 Text(
                     text = stringResource(
-                        R.string.bodyweight_set_count,
+                        R.string.workout_set_count,
                         localizeNumber(draft.completedSetCount, usePersianDigits),
                     ),
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -232,7 +233,7 @@ private fun ActiveWorkoutSection(
                     ) {
                         Icon(Icons.Filled.Add, contentDescription = null)
                         Spacer(Modifier.width(6.dp))
-                        Text(stringResource(R.string.bodyweight_add_exercise))
+                        Text(stringResource(R.string.workout_add_exercise))
                     }
                     Button(
                         onClick = onFinish,
@@ -241,7 +242,7 @@ private fun ActiveWorkoutSection(
                     ) {
                         Icon(Icons.Filled.Check, contentDescription = null)
                         Spacer(Modifier.width(6.dp))
-                        Text(stringResource(R.string.bodyweight_finish))
+                        Text(stringResource(R.string.workout_finish))
                     }
                 }
             }
@@ -249,7 +250,7 @@ private fun ActiveWorkoutSection(
 
         if (draft.activities.isEmpty()) {
             Text(
-                text = stringResource(R.string.bodyweight_no_exercises),
+                text = stringResource(R.string.workout_no_exercises),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(horizontal = 4.dp),
             )
@@ -271,7 +272,7 @@ private fun ActiveWorkoutSection(
 
 @Composable
 private fun ActivityCard(
-    activity: BodyweightActivity,
+    activity: StrengthActivity,
     usePersianNames: Boolean,
     usePersianDigits: Boolean,
     isBusy: Boolean,
@@ -281,9 +282,9 @@ private fun ActivityCard(
 ) {
     var value by rememberSaveable(activity.id) { mutableStateOf("") }
     val unit = if (activity.measureType == MeasureType.REPS) {
-        stringResource(R.string.bodyweight_reps)
+        stringResource(R.string.workout_reps)
     } else {
-        stringResource(R.string.bodyweight_seconds)
+        stringResource(R.string.workout_seconds)
     }
 
     Card(modifier = Modifier.fillMaxWidth()) {
@@ -302,13 +303,13 @@ private fun ActivityCard(
                         fontWeight = FontWeight.SemiBold,
                     )
                     Text(
-                        text = stringResource(
+                        text = "${loadTypeLabel(activity.loadType)} • ${stringResource(
                             if (activity.measureType == MeasureType.REPS) {
-                                R.string.bodyweight_reps_label
+                                R.string.workout_reps_label
                             } else {
-                                R.string.bodyweight_timed_label
+                                R.string.workout_timed_label
                             }
-                        ),
+                        )}",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -316,7 +317,7 @@ private fun ActivityCard(
                 IconButton(onClick = onRemoveActivity, enabled = !isBusy) {
                     Icon(
                         imageVector = Icons.Filled.Delete,
-                        contentDescription = stringResource(R.string.bodyweight_remove_exercise),
+                        contentDescription = stringResource(R.string.workout_remove_exercise),
                     )
                 }
             }
@@ -329,7 +330,7 @@ private fun ActivityCard(
                     val setValue = set.reps ?: set.durationSec ?: 0
                     Text(
                         text = stringResource(
-                            R.string.bodyweight_set_row,
+                            R.string.workout_set_row,
                             localizeNumber(set.setNumber, usePersianDigits),
                             localizeNumber(setValue, usePersianDigits),
                             unit,
@@ -339,7 +340,7 @@ private fun ActivityCard(
                     IconButton(onClick = { onRemoveSet(set.id) }, enabled = !isBusy) {
                         Icon(
                             imageVector = Icons.Filled.Delete,
-                            contentDescription = stringResource(R.string.bodyweight_remove_set),
+                            contentDescription = stringResource(R.string.workout_remove_set),
                         )
                     }
                 }
@@ -355,7 +356,7 @@ private fun ActivityCard(
                     value = value,
                     onValueChange = { value = it },
                     modifier = Modifier.weight(1f),
-                    label = { Text(stringResource(R.string.bodyweight_value_hint, unit)) },
+                    label = { Text(stringResource(R.string.workout_value_hint, unit)) },
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     leadingIcon = {
@@ -373,7 +374,7 @@ private fun ActivityCard(
                     onClick = { onAddSet(value) },
                     enabled = value.isNotBlank() && !isBusy,
                 ) {
-                    Text(stringResource(R.string.bodyweight_log_set))
+                    Text(stringResource(R.string.workout_log_set))
                 }
             }
         }
@@ -382,9 +383,9 @@ private fun ActivityCard(
 
 @Composable
 private fun ExercisePickerDialog(
-    exercises: List<BodyweightExercise>,
+    exercises: List<StrengthExercise>,
     usePersianNames: Boolean,
-    onSelect: (BodyweightExercise) -> Unit,
+    onSelect: (StrengthExercise) -> Unit,
     onDismiss: () -> Unit,
 ) {
     var query by rememberSaveable { mutableStateOf("") }
@@ -398,13 +399,13 @@ private fun ExercisePickerDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(stringResource(R.string.bodyweight_choose_exercise)) },
+        title = { Text(stringResource(R.string.workout_choose_exercise)) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 OutlinedTextField(
                     value = query,
                     onValueChange = { query = it },
-                    label = { Text(stringResource(R.string.bodyweight_search_exercise)) },
+                    label = { Text(stringResource(R.string.workout_search_exercise)) },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth(),
                 )
@@ -421,13 +422,13 @@ private fun ExercisePickerDialog(
                                 fontWeight = FontWeight.Medium,
                             )
                             Text(
-                                text = stringResource(
+                                text = "${loadTypeLabel(exercise.loadType)} • ${stringResource(
                                     if (exercise.measureType == MeasureType.REPS) {
-                                        R.string.bodyweight_reps_label
+                                        R.string.workout_reps_label
                                     } else {
-                                        R.string.bodyweight_timed_label
+                                        R.string.workout_timed_label
                                     }
-                                ),
+                                )}",
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
@@ -438,14 +439,14 @@ private fun ExercisePickerDialog(
             }
         },
         confirmButton = {
-            TextButton(onClick = onDismiss) { Text(stringResource(R.string.bodyweight_close)) }
+            TextButton(onClick = onDismiss) { Text(stringResource(R.string.workout_close)) }
         },
     )
 }
 
 @Composable
 private fun WorkoutSummaryCard(
-    workout: BodyweightWorkoutSummary,
+    workout: WorkoutSummary,
     useJalali: Boolean,
     usePersianDigits: Boolean,
 ) {
@@ -461,14 +462,14 @@ private fun WorkoutSummaryCard(
             )
             Text(
                 text = stringResource(
-                    R.string.bodyweight_summary_exercises_sets,
+                    R.string.workout_summary_exercises_sets,
                     localizeNumber(workout.exerciseCount, usePersianDigits),
                     localizeNumber(workout.setCount, usePersianDigits),
                 ),
             )
             Text(
                 text = stringResource(
-                    R.string.bodyweight_summary_reps_time,
+                    R.string.workout_summary_reps_time,
                     localizeNumber(workout.totalReps, usePersianDigits),
                     formatDuration(workout.totalDurationSec.toLong(), usePersianDigits),
                 ),
@@ -476,7 +477,7 @@ private fun WorkoutSummaryCard(
             )
             Text(
                 text = stringResource(
-                    R.string.bodyweight_summary_duration,
+                    R.string.workout_summary_duration,
                     formatDuration(workout.activeDurationSec, usePersianDigits),
                 ),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -486,18 +487,28 @@ private fun WorkoutSummaryCard(
 }
 
 @Composable
-private fun BodyweightMessage?.localizedText(): String = when (this) {
-    BodyweightMessage.WORKOUT_READY -> stringResource(R.string.bodyweight_message_ready)
-    BodyweightMessage.EXERCISE_ADDED -> stringResource(R.string.bodyweight_message_exercise_added)
-    BodyweightMessage.SET_ADDED -> stringResource(R.string.bodyweight_message_set_added)
-    BodyweightMessage.SET_REMOVED -> stringResource(R.string.bodyweight_message_set_removed)
-    BodyweightMessage.EXERCISE_REMOVED -> stringResource(R.string.bodyweight_message_exercise_removed)
-    BodyweightMessage.WORKOUT_FINISHED -> stringResource(R.string.bodyweight_message_finished)
-    BodyweightMessage.INVALID_INPUT -> stringResource(R.string.bodyweight_message_invalid)
-    BodyweightMessage.EMPTY_WORKOUT -> stringResource(R.string.bodyweight_message_empty)
-    BodyweightMessage.OPERATION_FAILED -> stringResource(R.string.bodyweight_message_failed)
+private fun WorkoutMessage?.localizedText(): String = when (this) {
+    WorkoutMessage.WORKOUT_READY -> stringResource(R.string.workout_message_ready)
+    WorkoutMessage.EXERCISE_ADDED -> stringResource(R.string.workout_message_exercise_added)
+    WorkoutMessage.SET_ADDED -> stringResource(R.string.workout_message_set_added)
+    WorkoutMessage.SET_REMOVED -> stringResource(R.string.workout_message_set_removed)
+    WorkoutMessage.EXERCISE_REMOVED -> stringResource(R.string.workout_message_exercise_removed)
+    WorkoutMessage.WORKOUT_FINISHED -> stringResource(R.string.workout_message_finished)
+    WorkoutMessage.INVALID_INPUT -> stringResource(R.string.workout_message_invalid)
+    WorkoutMessage.EMPTY_WORKOUT -> stringResource(R.string.workout_message_empty)
+    WorkoutMessage.OPERATION_FAILED -> stringResource(R.string.workout_message_failed)
     null -> ""
 }
+
+@Composable
+private fun loadTypeLabel(loadType: LoadType): String = stringResource(
+    when (loadType) {
+        LoadType.BODYWEIGHT -> R.string.workout_load_bodyweight
+        LoadType.WEIGHTED -> R.string.workout_load_weighted
+        LoadType.ASSISTED -> R.string.workout_load_assisted
+        LoadType.BODYWEIGHT_PLUS -> R.string.workout_load_bodyweight_plus
+    }
+)
 
 private fun formatDate(isoDate: String, useJalali: Boolean, persianDigits: Boolean): String =
     runCatching {

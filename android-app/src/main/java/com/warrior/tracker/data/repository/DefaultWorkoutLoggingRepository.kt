@@ -21,23 +21,23 @@ import com.warrior.tracker.data.local.entity.ActivityEntity
 import com.warrior.tracker.data.local.entity.ExerciseDailyStatsEntity
 import com.warrior.tracker.data.local.entity.SetEntity
 import com.warrior.tracker.data.local.entity.WorkoutEntity
-import com.warrior.tracker.data.local.model.WorkoutWithBodyweightDetails
+import com.warrior.tracker.data.local.model.WorkoutWithDetails
 import com.warrior.tracker.data.seed.BodyweightExerciseSeeder
-import com.warrior.tracker.domain.model.BodyweightActivity
-import com.warrior.tracker.domain.model.BodyweightExercise
-import com.warrior.tracker.domain.model.BodyweightSet
-import com.warrior.tracker.domain.model.BodyweightWorkoutDraft
-import com.warrior.tracker.domain.model.BodyweightWorkoutSummary
-import com.warrior.tracker.domain.repository.BodyweightWorkoutRepository
+import com.warrior.tracker.domain.model.StrengthActivity
+import com.warrior.tracker.domain.model.StrengthExercise
+import com.warrior.tracker.domain.model.LoggedSet
+import com.warrior.tracker.domain.model.WorkoutDraft
+import com.warrior.tracker.domain.model.WorkoutSummary
+import com.warrior.tracker.domain.repository.WorkoutLoggingRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import java.util.UUID
 import javax.inject.Inject
 import javax.inject.Singleton
 
-/** Room-backed implementation of the end-to-end bodyweight workout logger. */
+/** Room-backed implementation of logging for the existing Workouts flow. */
 @Singleton
-class DefaultBodyweightWorkoutRepository @Inject constructor(
+class DefaultWorkoutLoggingRepository @Inject constructor(
     private val database: AppDatabase,
     private val workoutDao: WorkoutDao,
     private val activityDao: ActivityDao,
@@ -47,20 +47,21 @@ class DefaultBodyweightWorkoutRepository @Inject constructor(
     private val statsDao: StatsDao,
     private val seeder: BodyweightExerciseSeeder,
     private val clock: Clock,
-) : BodyweightWorkoutRepository {
+) : WorkoutLoggingRepository {
 
-    override fun observeDraft(): Flow<BodyweightWorkoutDraft?> =
+    override fun observeDraft(): Flow<WorkoutDraft?> =
         workoutDao.observeInProgressWorkoutDetails().map { details -> details?.toDomain() }
 
-    override fun observeExercises(): Flow<List<BodyweightExercise>> =
+    override fun observeExercises(): Flow<List<StrengthExercise>> =
         exerciseDao.getBodyweightExercises().map { exercises ->
             exercises.mapNotNull { exercise ->
                 val nameEn = exercise.nameEn ?: exercise.customName ?: return@mapNotNull null
                 val nameFa = exercise.nameFa ?: exercise.customName ?: nameEn
-                BodyweightExercise(
+                StrengthExercise(
                     id = exercise.id,
                     nameEn = nameEn,
                     nameFa = nameFa,
+                    loadType = exercise.loadType,
                     measureType = exercise.measureType,
                     equipment = exercise.equipment,
                     difficulty = exercise.difficulty,
@@ -68,10 +69,10 @@ class DefaultBodyweightWorkoutRepository @Inject constructor(
             }
         }
 
-    override fun observeRecentWorkouts(limit: Int): Flow<List<BodyweightWorkoutSummary>> =
-        workoutDao.observeRecentBodyweightWorkouts(limit.coerceIn(1, 100)).map { rows ->
+    override fun observeRecentWorkouts(limit: Int): Flow<List<WorkoutSummary>> =
+        workoutDao.observeRecentStrengthWorkouts(limit.coerceIn(1, 100)).map { rows ->
             rows.map { row ->
-                BodyweightWorkoutSummary(
+                WorkoutSummary(
                     id = row.id,
                     startedAt = row.startedAt,
                     localDate = row.localDate,
@@ -283,8 +284,8 @@ class DefaultBodyweightWorkoutRepository @Inject constructor(
 
     private class RepositoryFailure(val error: WarriorError) : RuntimeException()
 
-    private fun WorkoutWithBodyweightDetails.toDomain(): BodyweightWorkoutDraft =
-        BodyweightWorkoutDraft(
+    private fun WorkoutWithDetails.toDomain(): WorkoutDraft =
+        WorkoutDraft(
             id = workout.id,
             startedAt = workout.startedAt,
             localDate = workout.localDate,
@@ -295,14 +296,15 @@ class DefaultBodyweightWorkoutRepository @Inject constructor(
                     if (item.activity.type != ActivityType.STRENGTH || exercise.loadType != LoadType.BODYWEIGHT) {
                         return@mapNotNull null
                     }
-                    BodyweightActivity(
+                    StrengthActivity(
                         id = item.activity.id,
                         exerciseId = exercise.id,
                         nameEn = exercise.nameEn ?: exercise.customName ?: exercise.id,
                         nameFa = exercise.nameFa ?: exercise.customName ?: exercise.nameEn ?: exercise.id,
+                        loadType = exercise.loadType,
                         measureType = exercise.measureType,
                         sets = item.sets.sortedBy { it.setNumber }.map { set ->
-                            BodyweightSet(
+                            LoggedSet(
                                 id = set.id,
                                 setNumber = set.setNumber,
                                 reps = set.reps,

@@ -13,7 +13,7 @@ through a manual export that you initiate.
 | Phase | Scope | State |
 |---|---|---|
 | **0** | Project foundation: Gradle KTS, Compose/M3, Hilt, Room (10 tables), dark/light theme, FA/EN + RTL + Jalali, CI, unit tests | ✅ complete (audited & fixed — see below) |
-| **1A** | Bodyweight logging: resumable draft, 19 built-in exercises, reps/timed sets, recent-session tracking | ✅ complete in v0.2.0 |
+| **1A** | Workouts: integrated bodyweight Strength exercises, resumable draft, reps/timed sets, recent-session tracking | ✅ complete in v0.2.0 |
 | 1B | Weighted strength input, timer + foreground service | ⬜ |
 | 2 | Boxing activities, round/rest timer, manual rounds | ⬜ |
 | 3 | History (list + Jalali calendar), detail, edit, delete with undo | ⬜ |
@@ -25,12 +25,15 @@ See [`PHASES.md`](PHASES.md) for the phase plan and delivery reports, and
 [`ARCHITECTURE.md`](ARCHITECTURE.md) for the full design document (18 sections — domain model,
 schema, metric definitions, validation rules, testing strategy).
 
-### Bodyweight logger (v0.2.0)
+### Bodyweight Strength in Workouts (v0.2.0)
 
-The Workouts tab now provides a complete offline bodyweight flow: start or resume the single saved
-workout draft, choose from 19 bilingual push/pull/legs/core exercises, log repetition or timed-hold
-sets, remove mistakes, finish the session, and review recent totals. Every confirmed set is written
-to Room immediately; finishing refreshes affected daily-stat cache rows from the raw sets.
+Bodyweight is integrated into Warrior's existing Workouts flow as a Strength load type—not a
+separate program or section. Start or resume the normal workout draft, add one of 19 bilingual
+bodyweight exercises from the Strength picker, log repetition or timed-hold sets, remove mistakes,
+finish the session, and review recent workout totals. Every confirmed set is written to Room
+immediately; finishing refreshes affected daily-stat cache rows from the raw sets. The logging
+models and repository boundary remain generic so weighted and assisted Strength inputs can be
+added without creating another workout flow.
 
 ---
 

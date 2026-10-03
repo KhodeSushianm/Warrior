@@ -2,20 +2,22 @@ package com.warrior.tracker.domain.model
 
 import com.warrior.tracker.core.common.Equipment
 import com.warrior.tracker.core.common.ExerciseDifficulty
+import com.warrior.tracker.core.common.LoadType
 import com.warrior.tracker.core.common.MeasureType
 
-/** A selectable strength exercise whose resistance is the athlete's own body weight. */
-data class BodyweightExercise(
+/** A selectable Strength exercise; [loadType] identifies bodyweight, weighted, or assisted input. */
+data class StrengthExercise(
     val id: String,
     val nameEn: String,
     val nameFa: String,
+    val loadType: LoadType,
     val measureType: MeasureType,
     val equipment: Equipment,
     val difficulty: ExerciseDifficulty,
 )
 
-/** A completed set inside an in-progress bodyweight workout. */
-data class BodyweightSet(
+/** A completed set inside an in-progress Strength workout. */
+data class LoggedSet(
     val id: String,
     val setNumber: Int,
     val reps: Int?,
@@ -24,27 +26,28 @@ data class BodyweightSet(
 )
 
 /** One exercise/activity and all sets currently logged for it. */
-data class BodyweightActivity(
+data class StrengthActivity(
     val id: String,
     val exerciseId: String,
     val nameEn: String,
     val nameFa: String,
+    val loadType: LoadType,
     val measureType: MeasureType,
-    val sets: List<BodyweightSet>,
+    val sets: List<LoggedSet>,
 )
 
 /** The single resumable workout draft supported by the application policy. */
-data class BodyweightWorkoutDraft(
+data class WorkoutDraft(
     val id: String,
     val startedAt: Long,
     val localDate: String,
-    val activities: List<BodyweightActivity>,
+    val activities: List<StrengthActivity>,
 ) {
     val completedSetCount: Int get() = activities.sumOf { activity -> activity.sets.count { it.completedAt != null } }
 }
 
-/** Compact history row for a completed bodyweight workout. */
-data class BodyweightWorkoutSummary(
+/** Compact history row for a completed workout. */
+data class WorkoutSummary(
     val id: String,
     val startedAt: Long,
     val localDate: String,

@@ -7,10 +7,10 @@ import com.warrior.tracker.core.common.WarriorError
 import com.warrior.tracker.core.common.WarriorResult
 import com.warrior.tracker.core.settings.SettingsRepository
 import com.warrior.tracker.core.time.NumberInputParser
-import com.warrior.tracker.domain.model.BodyweightExercise
-import com.warrior.tracker.domain.model.BodyweightWorkoutDraft
-import com.warrior.tracker.domain.model.BodyweightWorkoutSummary
-import com.warrior.tracker.domain.repository.BodyweightWorkoutRepository
+import com.warrior.tracker.domain.model.StrengthExercise
+import com.warrior.tracker.domain.model.WorkoutDraft
+import com.warrior.tracker.domain.model.WorkoutSummary
+import com.warrior.tracker.domain.repository.WorkoutLoggingRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -20,7 +20,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-enum class BodyweightMessage {
+enum class WorkoutMessage {
     WORKOUT_READY,
     EXERCISE_ADDED,
     SET_ADDED,
@@ -32,38 +32,38 @@ enum class BodyweightMessage {
     OPERATION_FAILED,
 }
 
-data class BodyweightWorkoutUiState(
-    val draft: BodyweightWorkoutDraft? = null,
-    val exercises: List<BodyweightExercise> = emptyList(),
-    val recentWorkouts: List<BodyweightWorkoutSummary> = emptyList(),
+data class WorkoutLoggingUiState(
+    val draft: WorkoutDraft? = null,
+    val exercises: List<StrengthExercise> = emptyList(),
+    val recentWorkouts: List<WorkoutSummary> = emptyList(),
     val usePersianNames: Boolean = false,
     val useJalali: Boolean = false,
     val usePersianDigits: Boolean = false,
     val isBusy: Boolean = false,
-    val message: BodyweightMessage? = null,
+    val message: WorkoutMessage? = null,
 )
 
 private data class TransientState(
     val isBusy: Boolean = false,
-    val message: BodyweightMessage? = null,
+    val message: WorkoutMessage? = null,
 )
 
 @HiltViewModel
-class BodyweightWorkoutViewModel @Inject constructor(
-    private val repository: BodyweightWorkoutRepository,
+class WorkoutLoggingViewModel @Inject constructor(
+    private val repository: WorkoutLoggingRepository,
     settingsRepository: SettingsRepository,
 ) : ViewModel() {
 
     private val transient = MutableStateFlow(TransientState())
 
-    val state: StateFlow<BodyweightWorkoutUiState> = combine(
+    val state: StateFlow<WorkoutLoggingUiState> = combine(
         repository.observeDraft(),
         repository.observeExercises(),
         repository.observeRecentWorkouts(),
         settingsRepository.resolved,
         transient,
     ) { draft, exercises, recent, settings, action ->
-        BodyweightWorkoutUiState(
+        WorkoutLoggingUiState(
             draft = draft,
             exercises = exercises,
             recentWorkouts = recent,
@@ -76,46 +76,46 @@ class BodyweightWorkoutViewModel @Inject constructor(
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5_000),
-        initialValue = BodyweightWorkoutUiState(),
+        initialValue = WorkoutLoggingUiState(),
     )
 
     init {
         viewModelScope.launch {
             val result = repository.initialize()
             if (result is WarriorResult.Failure) {
-                transient.value = TransientState(message = BodyweightMessage.OPERATION_FAILED)
+                transient.value = TransientState(message = WorkoutMessage.OPERATION_FAILED)
             }
         }
     }
 
-    fun startOrResumeWorkout() = runAction(BodyweightMessage.WORKOUT_READY) {
+    fun startOrResumeWorkout() = runAction(WorkoutMessage.WORKOUT_READY) {
         repository.startOrResumeWorkout()
     }
 
-    fun addExercise(exerciseId: String) = runAction(BodyweightMessage.EXERCISE_ADDED) {
+    fun addExercise(exerciseId: String) = runAction(WorkoutMessage.EXERCISE_ADDED) {
         repository.addExercise(exerciseId)
     }
 
     fun addSet(activityId: String, rawValue: String) {
         val value = NumberInputParser.toIntOrNull(rawValue)
         if (value == null) {
-            transient.value = TransientState(message = BodyweightMessage.INVALID_INPUT)
+            transient.value = TransientState(message = WorkoutMessage.INVALID_INPUT)
             return
         }
-        runAction(BodyweightMessage.SET_ADDED) {
+        runAction(WorkoutMessage.SET_ADDED) {
             repository.addCompletedSet(activityId, value)
         }
     }
 
-    fun removeSet(setId: String) = runAction(BodyweightMessage.SET_REMOVED) {
+    fun removeSet(setId: String) = runAction(WorkoutMessage.SET_REMOVED) {
         repository.removeSet(setId)
     }
 
-    fun removeActivity(activityId: String) = runAction(BodyweightMessage.EXERCISE_REMOVED) {
+    fun removeActivity(activityId: String) = runAction(WorkoutMessage.EXERCISE_REMOVED) {
         repository.removeActivity(activityId)
     }
 
-    fun finishWorkout() = runAction(BodyweightMessage.WORKOUT_FINISHED) {
+    fun finishWorkout() = runAction(WorkoutMessage.WORKOUT_FINISHED) {
         repository.finishWorkout()
     }
 
@@ -124,7 +124,7 @@ class BodyweightWorkoutViewModel @Inject constructor(
     }
 
     private fun <T> runAction(
-        successMessage: BodyweightMessage,
+        successMessage: WorkoutMessage,
         action: suspend () -> WarriorResult<T>,
     ) {
         if (transient.value.isBusy) return
@@ -138,14 +138,14 @@ class BodyweightWorkoutViewModel @Inject constructor(
         }
     }
 
-    private fun WarriorError.toMessage(): BodyweightMessage = when (this) {
+    private fun WarriorError.toMessage(): WorkoutMessage = when (this) {
         is WarriorError.Validation -> if (field == "workout") {
-            BodyweightMessage.EMPTY_WORKOUT
+            WorkoutMessage.EMPTY_WORKOUT
         } else {
-            BodyweightMessage.INVALID_INPUT
+            WorkoutMessage.INVALID_INPUT
         }
         is WarriorError.NotFound,
         is WarriorError.Persistence,
-        -> BodyweightMessage.OPERATION_FAILED
+        -> WorkoutMessage.OPERATION_FAILED
     }
 }

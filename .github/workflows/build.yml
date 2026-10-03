@@ -127,6 +127,6 @@ jobs:
             gh release create "$RELEASE_TAG" "$RELEASE_APK" \
               --repo "$GITHUB_REPOSITORY" \
               --target "$TARGET_SHA" \
-              --title "Warrior v0.2.0 — Bodyweight Tracking" \
-              --notes "Offline bodyweight workout tracking with 19 bilingual exercises, resumable drafts, repetition and timed sets, daily statistics, and recent workout summaries. This is an installable debug-signed APK for Android 8.0 and newer."
+              --title "Warrior v0.2.0 — Bodyweight Strength in Workouts" \
+              --notes "Adds bodyweight as a Strength load type inside Warrior's existing Workouts flow. Includes 19 bilingual exercises, resumable drafts, repetition and timed sets, immediate offline persistence, daily statistics, and recent workout summaries. This is an installable debug-signed APK for Android 8.0 and newer."
           fi
