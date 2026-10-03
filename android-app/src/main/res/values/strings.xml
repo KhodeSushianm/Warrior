@@ -40,4 +40,45 @@
     <string name="coming_soon_phase_1">Coming in Phase 1: workout logging.</string>
     <string name="coming_soon_phase_3">Coming in Phase 3: history &amp; calendar.</string>
     <string name="coming_soon_phase_4">Coming in Phase 4: progress charts, goals and body weight.</string>
+
+    <!-- Workouts -->
+    <string name="workout_title">Workouts</string>
+    <string name="workout_subtitle">Build a Strength workout and log each completed set. Your draft is saved automatically.</string>
+    <string name="workout_start">Start workout</string>
+    <string name="workout_active">Active workout</string>
+    <string name="workout_date">Date: %1$s</string>
+    <string name="workout_set_count">%1$s completed sets</string>
+    <string name="workout_add_exercise">Add exercise</string>
+    <string name="workout_finish">Finish workout</string>
+    <string name="workout_no_exercises">Add your first exercise, then log every completed set.</string>
+    <string name="workout_reps">Reps</string>
+    <string name="workout_seconds">Seconds</string>
+    <string name="workout_value_hint">Enter %1$s</string>
+    <string name="workout_log_set">Log set</string>
+    <string name="workout_set_row">Set %1$s: %2$s %3$s</string>
+    <string name="workout_remove_set">Remove set</string>
+    <string name="workout_remove_exercise">Remove exercise</string>
+    <string name="workout_choose_exercise">Choose a Strength exercise</string>
+    <string name="workout_search_exercise">Search exercises</string>
+    <string name="workout_close">Close</string>
+    <string name="workout_recent">Recent workouts</string>
+    <string name="workout_no_history">Completed workouts will appear here.</string>
+    <string name="workout_summary_exercises_sets">%1$s exercises • %2$s sets</string>
+    <string name="workout_summary_reps_time">%1$s reps • %2$s timed work</string>
+    <string name="workout_summary_duration">Workout duration: %1$s</string>
+    <string name="workout_timed_label">Timed hold</string>
+    <string name="workout_load_bodyweight">Bodyweight</string>
+    <string name="workout_load_weighted">Weighted</string>
+    <string name="workout_load_bodyweight_plus">Bodyweight + load</string>
+    <string name="workout_load_assisted">Assisted</string>
+    <string name="workout_reps_label">Repetition exercise</string>
+    <string name="workout_message_ready">Workout is ready.</string>
+    <string name="workout_message_exercise_added">Exercise added.</string>
+    <string name="workout_message_set_added">Set saved.</string>
+    <string name="workout_message_set_removed">Set removed.</string>
+    <string name="workout_message_exercise_removed">Exercise removed.</string>
+    <string name="workout_message_finished">Workout completed and added to history.</string>
+    <string name="workout_message_invalid">Enter a valid positive value within the allowed range.</string>
+    <string name="workout_message_empty">Log at least one completed set before finishing.</string>
+    <string name="workout_message_failed">The operation could not be completed. Please try again.</string>
 </resources>

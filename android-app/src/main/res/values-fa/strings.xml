@@ -35,4 +35,45 @@
     <string name="coming_soon_phase_1">فاز ۱: ثبت تمرین، به‌زودی.</string>
     <string name="coming_soon_phase_3">فاز ۳: تاریخچه و تقویم، به‌زودی.</string>
     <string name="coming_soon_phase_4">فاز ۴: نمودارهای پیشرفت، هدف‌ها و وزن بدن، به‌زودی.</string>
+
+    <!-- تمرین‌ها -->
+    <string name="workout_title">تمرین‌ها</string>
+    <string name="workout_subtitle">یک تمرین قدرتی بساز و هر ست تکمیل‌شده را ثبت کن. پیش‌نویس به‌طور خودکار ذخیره می‌شود.</string>
+    <string name="workout_start">شروع تمرین</string>
+    <string name="workout_active">تمرین در حال اجرا</string>
+    <string name="workout_date">تاریخ: %1$s</string>
+    <string name="workout_set_count">%1$s ست تکمیل‌شده</string>
+    <string name="workout_add_exercise">افزودن حرکت</string>
+    <string name="workout_finish">پایان تمرین</string>
+    <string name="workout_no_exercises">اولین حرکت را اضافه کن و سپس هر ست تکمیل‌شده را ثبت کن.</string>
+    <string name="workout_reps">تکرار</string>
+    <string name="workout_seconds">ثانیه</string>
+    <string name="workout_value_hint">%1$s را وارد کن</string>
+    <string name="workout_log_set">ثبت ست</string>
+    <string name="workout_set_row">ست %1$s: %2$s %3$s</string>
+    <string name="workout_remove_set">حذف ست</string>
+    <string name="workout_remove_exercise">حذف حرکت</string>
+    <string name="workout_choose_exercise">انتخاب حرکت قدرتی</string>
+    <string name="workout_search_exercise">جست‌وجوی حرکت</string>
+    <string name="workout_close">بستن</string>
+    <string name="workout_recent">تمرین‌های اخیر</string>
+    <string name="workout_no_history">تمرین‌های تکمیل‌شده اینجا نمایش داده می‌شوند.</string>
+    <string name="workout_summary_exercises_sets">%1$s حرکت • %2$s ست</string>
+    <string name="workout_summary_reps_time">%1$s تکرار • %2$s تمرین زمان‌دار</string>
+    <string name="workout_summary_duration">مدت تمرین: %1$s</string>
+    <string name="workout_timed_label">حرکت زمان‌دار</string>
+    <string name="workout_load_bodyweight">وزن بدن</string>
+    <string name="workout_load_weighted">با وزنه</string>
+    <string name="workout_load_bodyweight_plus">وزن بدن + بار</string>
+    <string name="workout_load_assisted">کمکی</string>
+    <string name="workout_reps_label">حرکت تکراری</string>
+    <string name="workout_message_ready">تمرین آماده است.</string>
+    <string name="workout_message_exercise_added">حرکت اضافه شد.</string>
+    <string name="workout_message_set_added">ست ذخیره شد.</string>
+    <string name="workout_message_set_removed">ست حذف شد.</string>
+    <string name="workout_message_exercise_removed">حرکت حذف شد.</string>
+    <string name="workout_message_finished">تمرین تکمیل و به تاریخچه اضافه شد.</string>
+    <string name="workout_message_invalid">یک مقدار مثبت و معتبر در محدوده مجاز وارد کن.</string>
+    <string name="workout_message_empty">پیش از پایان، حداقل یک ست تکمیل‌شده ثبت کن.</string>
+    <string name="workout_message_failed">عملیات انجام نشد. دوباره تلاش کن.</string>
 </resources>

@@ -27,12 +27,15 @@ import androidx.compose.ui.unit.dp
 import com.warrior.tracker.R
 
 /**
- * Home tab (Phase 0 shell — sec.3). Real weekly summary tiles arrive in Phase 4;
- * "Start Workout" is wired to the Draft flow in Phase 1.
+ * Home tab (sec.3). Real weekly summary tiles arrive in Phase 4;
+ * "Start Workout" opens the persisted draft in the existing Workouts flow.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen(onOpenSettings: () -> Unit) {
+fun HomeScreen(
+    onOpenSettings: () -> Unit,
+    onStartWorkout: () -> Unit,
+) {
     Scaffold(
         topBar = {
             TopAppBar(
@@ -48,7 +51,7 @@ fun HomeScreen(onOpenSettings: () -> Unit) {
             )
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = { /* Phase 1: create Workout draft (sec.8.1) */ }) {
+            FloatingActionButton(onClick = onStartWorkout) {
                 Icon(Icons.Filled.Add, stringResource(R.string.home_start_workout))
             }
         },

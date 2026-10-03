@@ -31,6 +31,9 @@ interface SetDao {
     @Delete
     suspend fun deleteSet(set: SetEntity)
 
+    @Query("SELECT * FROM sets WHERE id = :id")
+    suspend fun getSetById(id: String): SetEntity?
+
     @Query("SELECT * FROM sets WHERE activity_id = :activityId ORDER BY set_number ASC")
     fun getSetsForActivity(activityId: String): Flow<List<SetEntity>>
 
