@@ -174,6 +174,31 @@ what caught `LocalDate.ofInstant` (API 34 only) in `Clock.localDateToday`, which
 
 ---
 
+## Web dashboard & bodyweight log
+
+Alongside the Android app, this repo ships a small Next.js dashboard (`src/`) that shows the live
+GitHub state of the repository — and, since **v0.3.0**, a **bodyweight training log** at
+`/bodyweight` (ثبت تمرینات بدنسازی با وزن بدن): the browser counterpart of the Android logger.
+
+It deliberately mirrors the Android domain instead of inventing a second one:
+
+- the same 19-exercise bilingual (EN/FA) seed catalogue from `BodyweightExerciseCatalog.kt`;
+- the same `LoadType` (`BODYWEIGHT`, `BODYWEIGHT_PLUS`, `ASSISTED`) and `MeasureType`
+  (`REPS`, `DURATION`) enum names, stored as TEXT;
+- the sec.15 input range table (reps 1..999, external load 0..1000 kg with two decimals,
+  holds 1..3600 s) re-implemented in `src/lib/bodyweight.ts`;
+- the `NumberInputParser` digit rules — Latin, Persian and Arabic-Indic digits plus `٫`/`،`
+  separators are all accepted;
+- the same tonnage rule: `SUM(external_load_kg × reps)` of **added-load, non-warm-up** sets only —
+  pure bodyweight and assisted work contributes 0.
+
+Data lives in PostgreSQL via Drizzle (`src/db/schema.ts` — workouts owner, sets cascade on
+delete, UUID keys, UTC timestamps, kg only). To run locally: copy `.env.example` to
+`.env.local`, point `DATABASE_URL` at a PostgreSQL database, then
+`npx drizzle-kit push` and `npm run dev`.
+
+---
+
 ## License
 
 To be decided.

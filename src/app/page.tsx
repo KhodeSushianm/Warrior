@@ -1,6 +1,7 @@
 import { db } from "@/db";
 import { sql } from "drizzle-orm";
 import { cookies } from "next/headers";
+import Link from "next/link";
 import {
   fetchAuthedLogin,
   fetchBranches,
@@ -299,6 +300,25 @@ export default async function HomePage({ searchParams }: HomePageProps) {
                 Connect GitHub account
               </a>
             )}
+          </div>
+        </section>
+
+        <section className="rounded-3xl border border-white/10 bg-white/[0.03] p-6">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h2 className="text-lg font-semibold text-white">Bodyweight training log</h2>
+              <p className="mt-2 text-sm text-slate-400">
+                ثبت تمرینات بدنسازی با وزن بدن — log pull-ups, push-ups, squats and holds from the browser
+                with the same domain rules as the Android app (load types, rep/duration ranges, added
+                tonnage).
+              </p>
+            </div>
+            <Link
+              href="/bodyweight"
+              className="inline-flex w-fit shrink-0 items-center rounded-xl bg-white px-5 py-3 text-sm font-medium text-slate-900 hover:bg-slate-200"
+            >
+              Open bodyweight log
+            </Link>
           </div>
         </section>
 
